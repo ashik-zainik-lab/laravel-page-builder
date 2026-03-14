@@ -94,10 +94,14 @@ class PageBuilderServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Register section paths from config
-        Section::add(config('pagebuilder.sections'));
+        if ($sections = config('pagebuilder.sections')) {
+            Section::add($sections);
+        }
 
         // Register block paths from config
-        Block::add(config('pagebuilder.blocks'));
+        if ($blocks = config('pagebuilder.blocks')) {
+            Block::add($blocks);
+        }
 
         // Register page routes
         Page::routes();
