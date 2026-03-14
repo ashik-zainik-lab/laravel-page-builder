@@ -1,0 +1,15 @@
+.DS_Store
+.phpunit.result.cache
+/.fleet
+/.idea
+/.phpunit.cache
+/phpunit.xml
+/.vscode
+/node_modules
+/laravel
+/vendor
+composer.phar
+composer.lock
+Thumbs.db
+hot
+workbench/storage

@@ -1,0 +1,17 @@
+{
+    "sections": {
+        "main": {
+            "type": "page-content",
+            "settings": {
+                "max_width": "4xl",
+                "padding_top": "md",
+                "padding_bottom": "md"
+            },
+            "blocks": [],
+            "order": []
+        }
+    },
+    "order": [
+        "main"
+    ]
+}

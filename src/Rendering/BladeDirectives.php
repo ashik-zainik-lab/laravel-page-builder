@@ -1,0 +1,126 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Coderstm\PageBuilder\Rendering;
+
+use Coderstm\PageBuilder\PageBuilder;
+use Coderstm\PageBuilder\Support\PageData;
+use Illuminate\Support\Facades\Blade;
+
+/**
+ * Registers Blade directives for the page builder.
+ *
+ *   @blocks($section|$block)  — renders blocks within a section or container block
+ *
+ *   @schema([...])            — no-op (extracted at registration time)
+ *
+ *   @pbEditorClass            — injects editor CSS class when in editor mode
+ */
+class BladeDirectives
+{
+    /**
+     * Register all page builder Blade directives.
+     */
+    public static function register(): void
+    {
+        // @blocks($section) — renders all blocks within a section
+        // @blocks($block)   — renders child blocks inside a container block
+        Blade::directive('blocks', function (string $expression) {
+            return <<<PHP
+<?php
+\$__pb_ctx = {$expression};
+if (\$__pb_ctx instanceof \Coderstm\PageBuilder\Components\Block) {
+    echo app(\Coderstm\PageBuilder\Rendering\Renderer::class)
+        ->renderBlockChildren(\$__pb_ctx, \$section ?? null);
+} else {
+    echo app(\Coderstm\PageBuilder\Rendering\Renderer::class)
+        ->renderBlocks(\$__pb_ctx);
+}
+unset(\$__pb_ctx);
+?>
+PHP;
+        });
+
+        // @schema() — no-op; extracted at registration time, ignored at render
+        Blade::directive('schema', function () {
+            return '<?php /* @schema */ ?>';
+        });
+
+        // @sections('key')
+        // Renders a layout section (header, footer, etc.) from $__pb_layout.
+        // Searches header zone then footer zone by key — no second argument needed.
+        Blade::directive('sections', function (string $expression) {
+            return sprintf(
+                '<?php echo \Coderstm\PageBuilder\Rendering\BladeDirectives::renderLayoutSection($__pb_layout ?? null, %s); ?>',
+                trim($expression),
+            );
+        });
+
+        // @pbEditorClass
+        Blade::directive('pbEditorClass', function () {
+            return "<?php echo \Coderstm\PageBuilder\PageBuilder::class(); ?>";
+        });
+    }
+
+    /**
+     * Render a layout section by key from the given PageData.
+     *
+     * Called at runtime by the compiled @sections() directive.
+     * Searches header zone then footer zone — the directive does not need
+     * to know which zone a key belongs to.
+     *
+     * @param  string  $key  Layout section key (e.g. "header", "footer")
+     */
+    public static function renderLayoutSection(
+        ?PageData $layout,
+        string $key,
+    ): string {
+        if ($layout === null) {
+            return '';
+        }
+
+        $raw = $layout->layoutSection($key);
+
+        if ($raw === null) {
+            return '';
+        }
+
+        // Reuse existing Renderer::renderRawSection() — same path as body sections
+        $renderer = app(Renderer::class);
+
+        return $renderer->renderRawSection($key, $raw, PageBuilder::editor());
+    }
+
+    /**
+     * Register the Blade precompiler for auto-injecting editor directives
+     * into layouts that contain <html> and </body> tags.
+     */
+    public static function registerPrecompiler(): void
+    {
+        Blade::precompiler(function (string $value) {
+            if (! str_contains($value, '<html') || ! str_contains($value, '</body>')) {
+                return $value;
+            }
+
+            // Inject @pbEditorClass into the <html> tag
+            if (preg_match('/<html[^>]*class=["\']([^"\']*)["\']/i', $value)) {
+                $value = preg_replace(
+                    '/(<html[^>]*class=["\'])([^"\']*)(["\'])/i',
+                    '$1$2 @pbEditorClass$3',
+                    $value,
+                    1,
+                );
+            } else {
+                $value = preg_replace(
+                    '/(<html)/i',
+                    '$1 class="@pbEditorClass"',
+                    $value,
+                    1,
+                );
+            }
+
+            return $value;
+        });
+    }
+}

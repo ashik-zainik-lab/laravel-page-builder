@@ -1,0 +1,15 @@
+{
+    "sections": {
+        "hero": {
+            "type": "hero",
+            "settings": {
+                "title": "Hello"
+            },
+            "blocks": [],
+            "order": []
+        }
+    },
+    "order": [
+        "hero"
+    ]
+}

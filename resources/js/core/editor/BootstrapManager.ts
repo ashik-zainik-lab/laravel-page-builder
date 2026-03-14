@@ -1,0 +1,57 @@
+import type { EventBus } from "./EventBus";
+import type { PageManager } from "./PageManager";
+import type { HistoryManager } from "./HistoryManager";
+import type { NavigationManager } from "./NavigationManager";
+
+/**
+ * BootstrapManager — class-based startup/page-switch orchestration.
+ */
+export class BootstrapManager {
+    private initialLoaded = false;
+    private loadedSlug: string | null = null;
+
+    constructor(
+        private events: EventBus,
+        private pages: PageManager,
+        private history: HistoryManager,
+        private navigation: NavigationManager
+    ) {}
+
+    async loadInitialData(): Promise<void> {
+        if (this.initialLoaded) return;
+        this.initialLoaded = true;
+
+        await this.pages.loadAll();
+        await this.pages.loadSections();
+        this.pages.loadBlocks();
+
+        this.events.emit("bootstrap:loaded", {});
+    }
+
+    /**
+     * Sync route state after initial data load.
+     * - Redirect to first page when slug is missing
+     * - Load page when slug changes
+     */
+    async syncRoute(slug: string | undefined, pageList: any[]): Promise<void> {
+        if (!slug) {
+            if (pageList.length > 0) {
+                this.navigation.setPage(pageList[0].slug, { replace: true });
+            }
+            return;
+        }
+
+        if (this.loadedSlug === slug) return;
+
+        this.loadedSlug = slug;
+        this.history.reset();
+        await this.pages.load(slug);
+
+        this.events.emit("bootstrap:page-loaded", { slug });
+    }
+
+    reset(): void {
+        this.loadedSlug = null;
+        this.initialLoaded = false;
+    }
+}

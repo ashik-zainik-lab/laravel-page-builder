@@ -1,0 +1,21 @@
+import React, { useState } from "react";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+
+/**
+ * Asset search input.
+ *
+ * @param {string} value - Current search query
+ * @param {Function} onChange - Called with new query string
+ */
+export default function AssetSearch({ value, onChange }) {
+    return (
+        <Input
+            type="text"
+            icon={<Search className="w-3.5 h-3.5" />}
+            value={value}
+            placeholder="Search assets…"
+            onChange={(e) => onChange(e.target.value)}
+        />
+    );
+}

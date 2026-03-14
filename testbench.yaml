@@ -1,0 +1,41 @@
+laravel: "@testbench"
+
+providers:
+  - Coderstm\PageBuilder\Providers\PageBuilderServiceProvider
+  - Workbench\App\Providers\WorkbenchServiceProvider
+
+migrations:
+  - workbench/database/migrations
+
+seeders:
+  - Workbench\Database\Seeders\DatabaseSeeder
+
+workbench:
+  start: "/"
+  install: true
+  health: false
+  discovers:
+    web: true
+    api: true
+    commands: true
+    components: false
+    factories: true
+    views: true
+  build:
+    - sync-skeleton
+    - asset-publish
+    - create-sqlite-db
+    - db-wipe
+    - migrate-fresh
+  assets:
+    - laravel-assets
+  sync:
+    - from: storage
+      to: workbench/storage
+      reverse: true
+    - from: workbench/resources
+      to: resources
+
+env:
+  - CACHE_STORE=array
+  - CACHE_DRIVER=array

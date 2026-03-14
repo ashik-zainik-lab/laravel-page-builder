@@ -1,0 +1,14 @@
+{
+    "sections": {
+        "banner-1": {
+            "type": "banner",
+            "settings": {
+                "text": "Welcome Home"
+            },
+            "blocks": []
+        }
+    },
+    "order": [
+        "banner-1"
+    ]
+}

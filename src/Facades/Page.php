@@ -1,0 +1,27 @@
+<?php
+
+namespace Coderstm\PageBuilder\Facades;
+
+use Coderstm\PageBuilder\Services\PageService;
+use Illuminate\Support\Facades\Facade;
+
+/**
+ * @method static void routes()
+ * @method static array allActive()
+ * @method static \Illuminate\Database\Eloquent\Model|null findBySlug(string $slug)
+ * @method static bool saveMeta(string $slug, array $meta)
+ *
+ * @see PageService
+ */
+class Page extends Facade
+{
+    /**
+     * Get the registered name of the component.
+     *
+     * @return string
+     */
+    protected static function getFacadeAccessor()
+    {
+        return PageService::class;
+    }
+}

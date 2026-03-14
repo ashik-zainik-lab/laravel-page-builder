@@ -1,0 +1,32 @@
+* text=auto
+
+*.blade.php diff=html
+*.css diff=css
+*.html diff=html
+*.md diff=markdown
+*.php diff=php
+
+/.github export-ignore
+/scripts export-ignore
+/docs export-ignore
+/tests export-ignore
+/workbench export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
+.editorconfig export-ignore
+.styleci.yml export-ignore
+CHANGELOG.md export-ignore
+package.json export-ignore
+package-lock.json export-ignore
+yarn.lock export-ignore
+phpstan.neon.dist export-ignore
+phpunit.xml.dist export-ignore
+RELEASE.md export-ignore
+testbench.yaml export-ignore
+UPGRADE.md export-ignore
+CLAUDE.md export-ignore
+components.json export-ignore
+vite.config.js export-ignore
+postcss.config.js export-ignore
+tailwind.config.js export-ignore
+tsconfig.json export-ignore

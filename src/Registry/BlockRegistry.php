@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Coderstm\PageBuilder\Registry;
+
+use Coderstm\PageBuilder\Schema\BlockSchema;
+
+/**
+ * Discovers and provides block schemas from registered Blade file paths.
+ *
+ * The last registration for a given type wins, allowing themes to
+ * shadow built-in blocks.
+ *
+ * @extends BaseRegistry<BlockSchema>
+ */
+class BlockRegistry extends BaseRegistry
+{
+    protected function viewPrefix(): string
+    {
+        return 'blocks';
+    }
+
+    protected function createSchema(string $type, array $rawSchema): BlockSchema
+    {
+        return new BlockSchema($rawSchema);
+    }
+
+    /**
+     * Inject the filename-derived type into the raw schema so BlockSchema
+     * validation passes even if the Blade file omits 'type'.
+     */
+    protected function prepareRawSchema(string $type, array $rawSchema): array
+    {
+        $rawSchema['type'] = $type;
+
+        return $rawSchema;
+    }
+}

@@ -1,0 +1,42 @@
+{
+    "sections": {
+        "s1": {
+            "type": "banner",
+            "settings": {
+                "text": "Content"
+            }
+        }
+    },
+    "order": [
+        "s1"
+    ],
+    "layout": {
+        "type": "page",
+        "header": {
+            "sections": {
+                "header": {
+                    "type": "header",
+                    "settings": {
+                        "title": "My Site Header"
+                    }
+                }
+            },
+            "order": [
+                "header"
+            ]
+        },
+        "footer": {
+            "sections": {
+                "footer": {
+                    "type": "footer",
+                    "settings": {
+                        "copyright": "2026 NitroFIT"
+                    }
+                }
+            },
+            "order": [
+                "footer"
+            ]
+        }
+    }
+}
