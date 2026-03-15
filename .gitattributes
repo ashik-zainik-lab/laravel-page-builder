@@ -6,6 +6,7 @@
 *.md diff=markdown
 *.php diff=php
 
+/art
 /.github export-ignore
 /scripts export-ignore
 /docs export-ignore

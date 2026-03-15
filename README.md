@@ -7,6 +7,10 @@
 <a href="https://packagist.org/packages/coderstm/laravel-page-builder"><img src="https://img.shields.io/packagist/l/coderstm/laravel-page-builder" alt="License"></a>
 </p>
 
+<p align="center">
+  <img src="art/intro.gif" alt="Intro" />
+</p>
+
 A modern page builder for Laravel that allows you to build dynamic pages using layouts, sections and JSON rendering.
 It includes a visual editor, layout system, reusable sections and multi-theme support.
 
