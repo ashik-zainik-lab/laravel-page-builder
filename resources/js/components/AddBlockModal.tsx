@@ -268,11 +268,13 @@ export default function AddBlockModal({
     }, [isOpen, updatePreviewScale]);
 
     const handleAddBlock = (block: BlockSchema) => {
+        if (block.disabled) return;
         onAdd(block.type);
         onClose();
     };
 
     const handleBlockClick = (block: BlockSchema) => {
+        if (block.disabled) return;
         if (isMobile) {
             setSelectedType(block.type);
             setStep("preview");
@@ -314,12 +316,14 @@ export default function AddBlockModal({
 
                 {filteredBlocks.map((block) => {
                     const active = previewBlock?.type === block.type;
+                    const isDisabled = block.disabled === true;
                     const Icon = getBlockIcon(block.type);
                     return (
                         <button
                             key={block.type}
+                            disabled={isDisabled}
                             onMouseEnter={() => {
-                                if (isMobile) return;
+                                if (isMobile || isDisabled) return;
                                 if (hoverTimeoutRef.current)
                                     clearTimeout(hoverTimeoutRef.current);
                                 hoverTimeoutRef.current = setTimeout(() => {
@@ -333,11 +337,15 @@ export default function AddBlockModal({
                                     clearTimeout(hoverTimeoutRef.current);
                                 setHoveredType(null);
                             }}
-                            onFocus={() => setSelectedType(block.type)}
+                            onFocus={() => {
+                                if (!isDisabled) setSelectedType(block.type);
+                            }}
                             onClick={() => handleBlockClick(block)}
                             className={cn(
                                 "w-full mb-1 flex items-center gap-2 rounded-md px-2.5 py-2 text-left text-sm transition group",
-                                active && !isMobile
+                                isDisabled
+                                    ? "opacity-40 cursor-not-allowed text-gray-500"
+                                    : active && !isMobile
                                     ? "bg-gray-900 text-white"
                                     : "text-gray-700 hover:bg-gray-200",
                                 isMobile && "py-3 border-b border-gray-50"
@@ -347,7 +355,12 @@ export default function AddBlockModal({
                             <span className="truncate font-medium flex-1">
                                 {block.name}
                             </span>
-                            {isMobile && (
+                            {isDisabled && (
+                                <span className="text-xs text-gray-400 shrink-0">
+                                    Limit reached
+                                </span>
+                            )}
+                            {!isDisabled && isMobile && (
                                 <ArrowRight className="h-4 w-4 text-gray-300" />
                             )}
                         </button>

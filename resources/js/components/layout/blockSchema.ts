@@ -1,4 +1,4 @@
-import { BlockData, BlockSchema } from "@/types/page-builder";
+import { BlockData, BlockInstance, BlockSchema } from "@/types/page-builder";
 
 /* ── Schema Resolution Utilities ─────────────────────────────────────── */
 
@@ -82,24 +82,46 @@ export function resolveBlockSchema(
 }
 
 /**
- * Returns all addable BlockSchema objects for a given parent's raw blocks array.
+ * Returns all addable BlockSchema objects for a given parent's raw blocks array,
+ * optionally filtered by per-type limits.
  *
  *  @theme mode → every registered theme block.
  *  local entry → use the local definition as-is.
  *  bare ref    → resolve full schema from theme registry.
  *  empty       → [] (no "Add block").
+ *
+ * When `currentBlocks` is supplied, any block type whose `limit > 0` and whose
+ * current count in `currentBlocks` has reached that limit is marked with
+ * `disabled: true` — it remains visible in the picker but cannot be added.
  */
 export function getAddableBlockTypes(
     parentRawBlocks:
         | Array<{ type: string; [key: string]: any }>
         | undefined
         | null,
-    themeBlocks: Record<string, BlockData>
+    themeBlocks: Record<string, BlockData>,
+    currentBlocks?: Record<string, BlockInstance> | null
 ): BlockSchema[] {
     const raw = parentRawBlocks || [];
 
+    // Count existing blocks per type so we can enforce per-type limits.
+    const countByType: Record<string, number> = {};
+    if (currentBlocks) {
+        for (const block of Object.values(currentBlocks)) {
+            countByType[block.type] = (countByType[block.type] ?? 0) + 1;
+        }
+    }
+
+    const markIfAtLimit = (schema: BlockSchema): BlockSchema => {
+        const limit = schema.limit ?? 0;
+        if (limit <= 0) return schema;
+        const atLimit = (countByType[schema.type] ?? 0) >= limit;
+        return atLimit ? { ...schema, disabled: true } : schema;
+    };
+
     if (isThemeMode(raw)) {
-        return Object.values(themeBlocks).map((bd) => bd.schema);
+        return Object.values(themeBlocks)
+            .map((bd) => markIfAtLimit(bd.schema));
     }
 
     if (raw.length > 0) {
@@ -109,13 +131,13 @@ export function getAddableBlockTypes(
                 if (isLocalBlockEntry(entry)) {
                     // Local definition — used as-is for the picker; mark as local
                     // so callers (e.g. AddBlockModal) can skip the preview API call.
-                    return { ...(entry as unknown as BlockSchema), local: true };
+                    return markIfAtLimit({ ...(entry as unknown as BlockSchema), local: true });
                 }
                 // Bare theme-block reference — resolve from registry.
-                return (
+                const schema =
                     themeBlocks[entry.type]?.schema ??
-                    (entry as unknown as BlockSchema)
-                );
+                    (entry as unknown as BlockSchema);
+                return markIfAtLimit(schema);
             });
     }
 

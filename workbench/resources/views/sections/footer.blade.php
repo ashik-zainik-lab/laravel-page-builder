@@ -45,6 +45,7 @@
         [
             'type' => 'footer-column',
             'name' => 'Column',
+            'limit' => 3,
             'settings' => [
                 ['id' => 'title', 'type' => 'text', 'label' => 'Heading', 'default' => 'Column Heading'],
             ],
@@ -130,9 +131,7 @@
     $blocks = $section->blocks;
 @endphp
 
-{{-- ═══════════════════════════════════════════════════════════════════
-     DEFAULT style
-     ═══════════════════════════════════════════════════════════════════ --}}
+{{-- DEFAULT style --}}
 @if ($style === 'default')
     <footer class="bg-bg-darker border-t border-border-dark" {!! $section->editorAttributes() !!}>
         <div class="container mx-auto px-4 py-16">
@@ -229,9 +228,7 @@
         </div>
     </footer>
 
-    {{-- ═══════════════════════════════════════════════════════════════════
-     CENTERED style
-     ═══════════════════════════════════════════════════════════════════ --}}
+    {{-- CENTERED style --}}
 @elseif ($style === 'centered')
     <footer class="bg-bg-darker border-t border-border-dark" {!! $section->editorAttributes() !!}>
         <div class="container mx-auto px-4 py-20">
@@ -332,9 +329,7 @@
         </div>
     </footer>
 
-    {{-- ═══════════════════════════════════════════════════════════════════
-     MODERN style
-     ═══════════════════════════════════════════════════════════════════ --}}
+    {{-- MODERN style--}}
 @else
     <footer class="bg-gradient-to-b from-bg-dark to-bg-darker relative overflow-hidden" {!! $section->editorAttributes() !!}>
 

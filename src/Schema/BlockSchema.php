@@ -19,6 +19,9 @@ class BlockSchema implements Arrayable, JsonSerializable
 
     public readonly string $name;
 
+    /** Maximum number of this block type allowed in a single parent (0 = unlimited). */
+    public readonly int $limit;
+
     /** @var array<int, SettingSchema> */
     public readonly array $settings;
 
@@ -55,6 +58,7 @@ class BlockSchema implements Arrayable, JsonSerializable
 
         $this->type = $schema['type'];
         $this->name = $schema['name'];
+        $this->limit = (int) ($schema['limit'] ?? 0);
 
         $this->settings = array_map(
             fn (array $s) => new SettingSchema($s),
@@ -99,6 +103,7 @@ class BlockSchema implements Arrayable, JsonSerializable
         $data = [
             'type' => $this->type,
             'name' => $this->name,
+            'limit' => $this->limit,
             'settings' => array_map(fn (SettingSchema $s) => $s->toArray(), $this->settings),
         ];
 

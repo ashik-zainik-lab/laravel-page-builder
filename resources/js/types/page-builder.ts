@@ -110,6 +110,8 @@ export interface SectionSchema {
 export interface BlockSchema {
     type: string;
     name: string;
+    /** Maximum instances of this block type within one parent (0 = unlimited). */
+    limit?: number;
     settings: SettingSchema[];
     blocks?: { type: string; name: string }[];
     presets?: any[];
@@ -120,6 +122,11 @@ export interface BlockSchema {
      * via api.renderBlock().
      */
     local?: boolean;
+    /**
+     * True when the block's per-parent limit has been reached.
+     * The block is shown in the picker but cannot be added.
+     */
+    disabled?: boolean;
 }
 
 export interface BlockData {

@@ -1,4 +1,4 @@
-import React, {
+import {
     useState,
     useMemo,
     useCallback,
@@ -24,7 +24,7 @@ import {
     SectionData,
     SectionInstance,
 } from "@/types/page-builder";
-import { canShowAddBlock, getAddableBlockTypes } from "./blockSchema";
+import { getAddableBlockTypes } from "./blockSchema";
 import AddBlockRow from "./AddBlockRow";
 import BlockItem from "./BlockItem";
 
@@ -123,15 +123,17 @@ export default function LayoutSectionRow({
         [sectionSchema?.blocks]
     );
 
-    const canAddBlocks = useMemo(
-        () => canShowAddBlock(sectionRawBlocks),
+    const schemaSupportsBlocks = useMemo(
+        () => sectionRawBlocks.length > 0,
         [sectionRawBlocks]
     );
 
     const addableBlockTypes = useMemo(
-        () => getAddableBlockTypes(sectionRawBlocks, themeBlocks),
-        [sectionRawBlocks, themeBlocks]
+        () => getAddableBlockTypes(sectionRawBlocks, themeBlocks, section.blocks),
+        [sectionRawBlocks, themeBlocks, section.blocks]
     );
+
+    const canAddBlocks = addableBlockTypes.length > 0;
 
     const blockOrder: string[] =
         section.order || Object.keys(section.blocks || {});
@@ -323,8 +325,8 @@ export default function LayoutSectionRow({
                         })}
                     </SortableContext>
 
-                    {canAddBlocks && (
-                        <AddBlockRow depth={1} onAdd={handleAddBlock} />
+                    {schemaSupportsBlocks && (
+                        <AddBlockRow depth={1} onAdd={handleAddBlock} disabled={!canAddBlocks} />
                     )}
                 </div>
             )}

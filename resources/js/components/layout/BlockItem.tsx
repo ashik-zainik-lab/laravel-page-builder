@@ -117,21 +117,27 @@ export default function BlockItem({
         [blockSchema?.blocks]
     );
 
-    // Show "Add block" for @theme-mode AND local-mode child slots (not empty/invalid)
-    const canAddChildren = useMemo(
-        () => canShowAddBlock(childRawBlocks),
-        [childRawBlocks]
-    );
     const canInsertSiblingBlocks = useMemo(
         () => canShowAddBlock(parentRawBlocks),
         [parentRawBlocks]
     );
 
-    // The list of types the user can choose from when adding a child block
-    const addableChildTypes = useMemo(
-        () => getAddableBlockTypes(childRawBlocks, themeBlocks),
-        [childRawBlocks, themeBlocks]
+    // Whether the schema declares any child block slots at all (limit-agnostic).
+    const schemaSupportsChildren = useMemo(
+        () => canShowAddBlock(childRawBlocks),
+        [childRawBlocks]
     );
+
+    // The list of types the user can choose from when adding a child block.
+    // Filtered by per-type limits against the block's current children.
+    const addableChildTypes = useMemo(
+        () => getAddableBlockTypes(childRawBlocks, themeBlocks, block.blocks),
+        [childRawBlocks, themeBlocks, block.blocks]
+    );
+
+    // False when every allowed child block type has hit its limit.
+    const canAddChildren = addableChildTypes.length > 0;
+
     const addableSiblingBlockTypes = useMemo(
         () => getAddableBlockTypes(parentRawBlocks, themeBlocks),
         [parentRawBlocks, themeBlocks]
@@ -637,8 +643,8 @@ export default function BlockItem({
                     </SortableContext>
 
                     {/* Inline "Add block" row */}
-                    {canAddChildren && (
-                        <AddBlockRow depth={depth + 1} onAdd={handleAddChild} />
+                    {schemaSupportsChildren && (
+                        <AddBlockRow depth={depth + 1} onAdd={handleAddChild} disabled={!canAddChildren} />
                     )}
                 </div>
             )}

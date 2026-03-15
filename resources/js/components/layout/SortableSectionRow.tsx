@@ -162,17 +162,20 @@ export default function SortableSectionRow({
         [sectionSchema?.blocks]
     );
 
-    // "Add block" shown for both @theme-mode and local-mode section schemas
-    const canAddBlocks = useMemo(
+    // Whether the schema declares any block slots at all (schema-level, limit-agnostic).
+    const schemaSupportsBlocks = useMemo(
         () => canShowAddBlock(sectionRawBlocks),
         [sectionRawBlocks]
     );
 
-    // The list of types the user can choose from when adding a top-level block
+    // The list of types still under their per-type limit.
     const addableBlockTypes = useMemo(
-        () => getAddableBlockTypes(sectionRawBlocks, themeBlocks),
-        [sectionRawBlocks, themeBlocks]
+        () => getAddableBlockTypes(sectionRawBlocks, themeBlocks, section.blocks),
+        [sectionRawBlocks, themeBlocks, section.blocks]
     );
+
+    // False when every allowed block type has hit its limit.
+    const canAddBlocks = addableBlockTypes.length > 0;
 
     const blockOrder: string[] =
         section.order || Object.keys(section.blocks || {});
@@ -544,9 +547,9 @@ export default function SortableSectionRow({
                         })}
                     </SortableContext>
 
-                    {/* Inline "Add block" row at section level */}
-                    {canAddBlocks && (
-                        <AddBlockRow depth={1} onAdd={handleAddBlock} />
+                    {/* Inline "Add block" row at section level — disabled when all types hit their limit */}
+                    {schemaSupportsBlocks && (
+                        <AddBlockRow depth={1} onAdd={handleAddBlock} disabled={!canAddBlocks} />
                     )}
                 </div>
             )}
