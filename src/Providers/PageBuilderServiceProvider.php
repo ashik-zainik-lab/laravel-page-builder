@@ -104,9 +104,6 @@ class PageBuilderServiceProvider extends ServiceProvider
             Block::add($blocks);
         }
 
-        // Register page routes
-        Page::routes();
-
         // Set active theme
         if ($activeTheme = config('theme.active')) {
             Theme::set($activeTheme);
@@ -121,6 +118,7 @@ class PageBuilderServiceProvider extends ServiceProvider
         // Routes
         Route::middleware(config('pagebuilder.middleware', ['web']))
             ->group(function () {
+                Page::routes();
                 $this->loadRoutesFrom(__DIR__.'/../../routes/web.php');
             });
 
