@@ -418,7 +418,53 @@ export default function LayoutPanel() {
                  *   3. Layout Bottom — pinned footer layout sections
                  *
                  * Each zone gets a small label divider for visual clarity.
+                 *
+                 * DndContext wraps ALL zones so that block drag-and-drop
+                 * works inside layout (header/footer) sections too.
                  */}
+                <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragStart={({ active }) => {
+                        const isSectionDrag =
+                            !active.data.current?.type ||
+                            active.data.current?.type === "section";
+                        setIsDraggingSections(isSectionDrag);
+                        if (isSectionDrag) {
+                            setCollapseAllSignal((s) => s + 1);
+                        }
+                        editor.layout.startDrag();
+                    }}
+                    onDragOver={({ active, over }) => {
+                        if (!over || active.id === over.id) return;
+                        const activeData = active.data.current;
+                        if (
+                            !activeData?.type ||
+                            activeData.type === "section"
+                        ) {
+                            const oldIdx = pageOnlyOrder.indexOf(
+                                active.id as string
+                            );
+                            const newIdx = pageOnlyOrder.indexOf(
+                                over.id as string
+                            );
+                            if (oldIdx !== -1 && newIdx !== -1) {
+                                editor.preview.reorderSections(
+                                    arrayMove(pageOnlyOrder, oldIdx, newIdx)
+                                );
+                            }
+                        }
+                    }}
+                    onDragEnd={(event) => {
+                        setIsDraggingSections(false);
+                        handleDragResult(event);
+                        editor.layout.endDrag();
+                    }}
+                    onDragCancel={() => {
+                        setIsDraggingSections(false);
+                        editor.layout.endDrag();
+                    }}
+                >
 
                 {/* ── Zone 1: Layout Top ────────────────────────────── */}
                 {(() => {
@@ -487,50 +533,7 @@ export default function LayoutPanel() {
                         </span>
                     </div>
 
-                    <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragStart={({ active }) => {
-                            const isSectionDrag =
-                                !active.data.current?.type ||
-                                active.data.current?.type === "section";
-                            setIsDraggingSections(isSectionDrag);
-                            if (isSectionDrag) {
-                                setCollapseAllSignal((s) => s + 1);
-                            }
-                            editor.layout.startDrag();
-                        }}
-                        onDragOver={({ active, over }) => {
-                            if (!over || active.id === over.id) return;
-                            const activeData = active.data.current;
-                            if (
-                                !activeData?.type ||
-                                activeData.type === "section"
-                            ) {
-                                const oldIdx = pageOnlyOrder.indexOf(
-                                    active.id as string
-                                );
-                                const newIdx = pageOnlyOrder.indexOf(
-                                    over.id as string
-                                );
-                                if (oldIdx !== -1 && newIdx !== -1) {
-                                    editor.preview.reorderSections(
-                                        arrayMove(pageOnlyOrder, oldIdx, newIdx)
-                                    );
-                                }
-                            }
-                        }}
-                        onDragEnd={(event) => {
-                            setIsDraggingSections(false);
-                            handleDragResult(event);
-                            editor.layout.endDrag();
-                        }}
-                        onDragCancel={() => {
-                            setIsDraggingSections(false);
-                            editor.layout.endDrag();
-                        }}
-                    >
-                        <SortableContext
+                    <SortableContext
                             items={pageOnlyOrder}
                             strategy={verticalListSortingStrategy}
                         >
@@ -586,7 +589,6 @@ export default function LayoutPanel() {
                                 );
                             })}
                         </SortableContext>
-                    </DndContext>
 
                     {/* Inline "Add section" row — sits after all page sections */}
                     <div
@@ -662,6 +664,7 @@ export default function LayoutPanel() {
                         </div>
                     );
                 })()}
+                </DndContext>
             </div>
 
             {/* Add-block modal */}
