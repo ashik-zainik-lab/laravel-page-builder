@@ -8,4 +8,7 @@
     ],
 ])
 
-<div class="banner" {!! $section->editorAttributes() !!}>{{ $section->settings->text }}</div>
+<div class="banner" {!! $section->editorAttributes() !!}>
+    <h3>{{ $section->settings->text }}</h3>
+    <img src="https://picsum.photos/seed/picsum/200/300" alt="{{ $section->settings->text }}">
+</div>
