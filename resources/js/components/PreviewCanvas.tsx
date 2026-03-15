@@ -148,7 +148,12 @@ export default function PreviewCanvas() {
           if (inspectorEnabled && sectionId && blockId) {
             const path = event.data.path;
             if (path) {
-              editor.selectBlock(sectionId, path);
+              const parsed = String(path).split(",").filter(Boolean);
+              if (parsed.length > 0) {
+                editor.selectBlock(sectionId, parsed);
+              } else {
+                editor.selectSection(sectionId);
+              }
             } else if (event.data.id) {
               const parsed = String(event.data.id).split(",").filter(Boolean);
               if (parsed.length > 0) {
