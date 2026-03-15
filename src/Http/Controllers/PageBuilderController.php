@@ -66,10 +66,9 @@ class PageBuilderController extends Controller
      */
     public function page(string $slug = 'home'): JsonResponse
     {
-        // Build the default layout by scanning the active layout Blade file.
-        $defaultLayout = $this->layoutParser->defaultLayout();
-
         $stored = $this->pageStorage->load($slug);
+        $layoutType = $stored?->layoutType() ?? 'page';
+        $defaultLayout = $this->layoutParser->defaultLayout($layoutType);
 
         $page = $stored !== null
             ? PageData::fromArray($stored->toArray(), $defaultLayout)

@@ -12,10 +12,10 @@ use Coderstm\PageBuilder\Tests\TestCase;
 class WebPageControllerTest extends TestCase
 {
     /**
-     * Registers the layout-test route and returns a mocked DB page stub.
+     * Registers the layout-default route and returns a mocked DB page stub.
      *
      * Uses the pre-existing workbench fixture:
-     *   workbench/storage/pages/layout-test.json
+     *   workbench/storage/pages/layout-default.json
      *
      * Sections and layouts are resolved from workbench Blade views — no
      * dynamic view creation is needed or allowed in this test.
@@ -23,16 +23,27 @@ class WebPageControllerTest extends TestCase
     private function setUpLayoutTestPage(): void
     {
         app(PageRegistry::class)->put([
-            'layout-test' => ['title' => 'A Test Page', 'slug' => 'layout-test'],
+            'layout-default' => ['title' => 'A Test Page with Layout', 'slug' => 'layout-default'],
+            'layout-simple' => ['title' => 'A Test Page with Simple Layout', 'slug' => 'layout-simple'],
         ]);
 
         Page::routes();
 
         Page::shouldReceive('findBySlug')
-            ->with('layout-test')
+            ->with('layout-default')
             ->andReturn(new PageStub([
                 'title' => 'A Test Page',
                 'meta_title' => 'A Test Page | My App',
+                'meta_description' => 'Test description',
+                'meta_keywords' => 'test, page',
+                'content' => '<p>Hello from page content</p>',
+            ]));
+
+        Page::shouldReceive('findBySlug')
+            ->with('layout-simple')
+            ->andReturn(new PageStub([
+                'title' => 'A Test Page with Simple Layout',
+                'meta_title' => 'A Test Page with Simple Layout | My App',
                 'meta_description' => 'Test description',
                 'meta_keywords' => 'test, page',
                 'content' => '<p>Hello from page content</p>',
@@ -43,7 +54,7 @@ class WebPageControllerTest extends TestCase
     {
         $this->setUpLayoutTestPage();
 
-        $response = $this->get(route('pages.layout-test'));
+        $response = $this->get(route('pages.layout-default'));
 
         $response->assertOk();
 
@@ -51,10 +62,41 @@ class WebPageControllerTest extends TestCase
 
         // ── Layout shell ──────────────────────────────────────────────────
         $this->assertStringContainsString('<html', $html);
-        $this->assertStringContainsString('<body class="bg-background-dark', $html);
+        $this->assertStringContainsString('<body class="page-layout', $html);
 
         // ── Meta tags from DB page ────────────────────────────────────────
         $this->assertStringContainsString('A Test Page | My App', $html);
+        $this->assertStringContainsString('content="Test description"', $html);
+        $this->assertStringContainsString('content="test, page"', $html);
+
+        // ── Layout sections (header / footer zones via header-group) ─────
+        // header-group.json defines header + announcement sub-sections.
+        // header.blade.php default title = 'Default Header Title' (schema default).
+        // header-group.json preset title = 'My Site Header'.
+        $this->assertStringContainsString('My Site Header', $html);
+
+        // ── Page body section (banner) ────────────────────────────────────
+        // workbench/resources/views/sections/banner.blade.php:
+        //   <div class="banner">{{ $section->settings->text }}</div>
+        $this->assertStringContainsString('<h3 class="text-2xl font-bold text-white">Content</h3>', $html);
+    }
+
+    public function test_renders_page_with_layout_simple_sections(): void
+    {
+        $this->setUpLayoutTestPage();
+
+        $response = $this->get(route('pages.layout-simple'));
+
+        $response->assertOk();
+
+        $html = $response->getContent();
+
+        // ── Layout shell ──────────────────────────────────────────────────
+        $this->assertStringContainsString('<html', $html);
+        $this->assertStringContainsString('<body class="simple-layout', $html);
+
+        // ── Meta tags from DB page ────────────────────────────────────────
+        $this->assertStringContainsString('A Test Page with Simple Layout | My App', $html);
         $this->assertStringContainsString('content="Test description"', $html);
         $this->assertStringContainsString('content="test, page"', $html);
 
@@ -62,20 +104,20 @@ class WebPageControllerTest extends TestCase
         // workbench/resources/views/sections/header.blade.php:
         //   <header {!! $section->editorAttributes() !!}>{{ $section->settings->title }}</header>
         // editorAttributes() returns '' when editor is off → <header >…</header>
+        $this->assertStringContainsString('Flash Sale! 50% Off Everything!', $html);
         $this->assertStringContainsString('My Site Header', $html);
-        $this->assertStringContainsString('2026 NitroFIT', $html);
 
         // ── Page body section (banner) ────────────────────────────────────
         // workbench/resources/views/sections/banner.blade.php:
         //   <div class="banner">{{ $section->settings->text }}</div>
-        $this->assertStringContainsString('<div class="banner" >Content</div>', $html);
+        $this->assertStringContainsString('<h3 class="text-2xl font-bold text-white">Content</h3>', $html);
     }
 
     public function test_shared_page_object_is_available_to_views(): void
     {
         $this->setUpLayoutTestPage();
 
-        $response = $this->get(route('pages.layout-test'));
+        $response = $this->get(route('pages.layout-default'));
 
         $response->assertOk();
 

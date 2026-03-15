@@ -30,7 +30,7 @@ class LayoutParserTest extends TestCase
         $layout = $this->parser->defaultLayout('simple');
 
         $this->assertSame('simple', $layout['type']);
-        $this->assertSame(['top-bar', 'header'], $layout['header']['order']);
+        $this->assertSame(['announcement', 'header'], $layout['header']['order']);
         $this->assertSame(['footer'], $layout['footer']['order']);
 
         $this->assertArrayHasKey('header', $layout['header']['sections']);

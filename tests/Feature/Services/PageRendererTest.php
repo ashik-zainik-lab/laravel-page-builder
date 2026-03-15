@@ -79,7 +79,6 @@ class PageRendererTest extends TestCase
                 ],
                 'footer-1' => [
                     'type' => 'footer',
-                    'settings' => ['copyright' => 'Last'],
                     'blocks' => [],
                 ],
             ],
@@ -87,7 +86,7 @@ class PageRendererTest extends TestCase
         ]);
 
         $bannerPos = strpos($html, 'First');
-        $footerPos = strpos($html, 'Last');
+        $footerPos = strpos($html, 'All rights reserved.');
 
         $this->assertNotFalse($bannerPos);
         $this->assertNotFalse($footerPos);

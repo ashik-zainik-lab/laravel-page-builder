@@ -192,6 +192,14 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Return the full Blade view name for the layout (e.g. "layouts.page").
+     */
+    public function layoutView(): string
+    {
+        return "layouts.{$this->layoutType()}";
+    }
+
+    /**
      * Return the raw section data for a given layout key, or null if absent/disabled.
      *
      * Searches both the header and footer zones, returning the first match.

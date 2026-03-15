@@ -52,19 +52,19 @@
         }
     </style>
 
-    @stack('style')
+    @stack('content_for_head')
 </head>
 
-<body class="simple-layout overflow-x-hidden antialiased">
+<body class="simple-layout bg-slate-50">
 
-    @sections('header-top')
+    @sections('announcement')
     @sections('header')
 
-    @yield('content')
+    <main class="min-h-screen">
+        @yield('content')
+    </main>
 
     @sections('footer')
-
-    @stack('script')
 </body>
 
 </html>

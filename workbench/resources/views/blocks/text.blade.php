@@ -30,6 +30,6 @@
     };
 @endphp
 
-<div class="py-4 {{ $alignmentClass }} text-text-body" {!! $block->editorAttributes() !!}>
+<div class="py-4 {{ $alignmentClass }} text-text-body text-block" {!! $block->editorAttributes() !!}>
     {{ $block->settings->content ?? '' }}
 </div>

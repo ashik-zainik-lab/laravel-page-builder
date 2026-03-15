@@ -3,6 +3,14 @@
     'settings' => [
         ['id' => 'title', 'type' => 'text', 'label' => 'Title', 'default' => 'Default Header Title'],
     ],
+    'presets' => [
+        [
+            'name' => 'My Site Header',
+            'settings' => [
+                'title' => 'My Site Header',
+            ],
+        ],
+    ],
 ])
 <header {!! $section->editorAttributes() !!} class="sticky top-0 z-50 w-full border-b border-border-dark bg-bg-dark/80 backdrop-blur-md">
     <div class="container mx-auto flex h-16 items-center justify-between px-4">

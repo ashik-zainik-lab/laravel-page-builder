@@ -37,9 +37,10 @@ class WebPageController extends Controller
             abort(404);
         }
 
-        $defaultLayout = $this->layoutParser->defaultLayout();
         $dbPage = Page::findBySlug($slug);
         $stored = $this->pageStorage->load($slug);
+        $layoutType = $stored?->layoutType() ?? 'page';
+        $defaultLayout = $this->layoutParser->defaultLayout($layoutType);
 
         // Share the DB page model with all views rendered in this request,
         // so section views (e.g. page-content) can access $page->title, $page->content, etc.

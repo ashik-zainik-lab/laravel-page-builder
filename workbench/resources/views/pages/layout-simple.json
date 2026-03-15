@@ -1,0 +1,36 @@
+{
+  "sections": {
+    "s1": {
+      "type": "banner",
+      "settings": {
+        "text": "Content"
+      }
+    }
+  },
+  "order": ["s1"],
+  "layout": {
+    "type": "simple",
+    "header": {
+      "sections": {
+        "announcement": {
+          "type": "announcement",
+          "settings": {
+            "text": "Flash Sale! 50% Off Everything!"
+          }
+        }
+      },
+      "order": ["announcement"]
+    },
+    "footer": {
+      "sections": {
+        "footer": {
+          "type": "footer",
+          "settings": {
+            "copyright": "2026 NitroFIT"
+          }
+        }
+      },
+      "order": ["footer"]
+    }
+  }
+}

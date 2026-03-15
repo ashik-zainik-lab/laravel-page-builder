@@ -52,18 +52,16 @@
         }
     </style>
 
-    @stack('style')
+    @stack('content_for_head')
 </head>
 
-<body class="overflow-x-hidden antialiased">
+<body class="page-layout overflow-x-hidden antialiased">
 
     @sections('header')
 
     @yield('content')
 
     @sections('footer')
-
-    @stack('script')
 </body>
 
 </html>
