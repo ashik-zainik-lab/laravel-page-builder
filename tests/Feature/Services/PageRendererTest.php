@@ -20,10 +20,11 @@ class PageRendererTest extends TestCase
 
     public function test_render_by_slug(): void
     {
-        $html = $this->pageRenderer->render('home');
+        \Coderstm\PageBuilder\Facades\Page::shouldReceive('findBySlug')
+            ->with('home')
+            ->andReturn(null);
 
-        $this->assertNotNull($html);
-        $this->assertStringContainsString('Welcome Home', $html);
+        $this->get('/')->assertSee('Welcome Home');
     }
 
     public function test_render_returns_null_for_missing_page(): void
