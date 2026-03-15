@@ -5,6 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.7] - 2026-03-15
+
+### Added
+
+- Implemented a new Tailwind CSS design system with custom colors and fonts for core layouts, text blocks, and section components
+- Added new announcement section and refactored layout handling to support dynamic layout types
+- Implemented iframe communication for interactive preview
+- Added support for recursive nested block operations and schema adjustments
+- Enhanced banner section layout to include heading and image
+- Implemented block limit functionality to disable add block options when limits are reached
+- Added `local` flag to `BlockSchema` for handling local block previews in `AddBlockModal`
+- Enhanced `LayoutPanel` and `LayoutSectionRow` components with improved block selection and management features
+
+### Changed
+
+- Refactored drag-and-drop functionality in `LayoutPanel` to consolidate `DndContext` and improve section reordering
+
+## [1.0.6] - 2026-03-15
+
+### Changed
+
+- Enhanced block selection logic in `PreviewCanvas` to handle empty paths and fallback to section selection
+
+## [1.0.5] - 2026-03-15
+
+### Changed
+
+- Adjusted `scriptVariables` method to reorder pages array for improved structure
+
+## [1.0.4] - 2026-03-15
+
+### Added
+
+- Enhanced home page structure with detailed contact form and social blocks
+- Added contact form section with schema and blocks
+- Added `SESSION_DRIVER` configuration to testbench environment
+
+### Changed
+
+- Refactored page routes registration
+
 ## [1.0.3] - 2026-03-14
 
 ### Added
