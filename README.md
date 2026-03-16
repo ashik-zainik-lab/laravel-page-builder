@@ -531,23 +531,13 @@ themes/my-theme/views/templates/product.json      ← theme-specific product tem
 ### In Controllers
 
 ```php
-use Coderstm\PageBuilder\Services\PageRenderer;
+use Coderstm\PageBuilder\Facades\Page;
 
 class PageController extends Controller
 {
-    public function __construct(
-        private readonly PageRenderer $pageRenderer,
-    ) {}
-
     public function show(string $slug)
     {
-        $html = $this->pageRenderer->render($slug);
-
-        if ($html === null) {
-            abort(404);
-        }
-
-        return view('layouts.page', ['content' => $html]);
+        return Page::render($slug);
     }
 }
 ```
@@ -555,21 +545,13 @@ class PageController extends Controller
 ### Programmatic Page Rendering
 
 ```php
-use Coderstm\PageBuilder\Services\PageRenderer;
-
-$renderer = app(PageRenderer::class);
+use Coderstm\PageBuilder\Facades\Page;
 
 // Render from slug (loads JSON from disk)
-$html = $renderer->render('home');
+$html = Page::render('home');
 
-// Render from raw data
-$html = $renderer->renderPage([
-    'sections' => [...],
-    'order' => [...],
-]);
-
-// Render with editor mode (adds data-editor-* attributes)
-$html = $renderer->render('home', editor: true);
+// Render with extra meta passed to the page model/template
+$html = Page::render('home', ['title' => 'My Home Page']);
 ```
 
 ---
