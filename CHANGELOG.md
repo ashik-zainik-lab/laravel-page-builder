@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.8] - 2026-03-16
+
+### Added
+
+- `pagebuilder:install` Artisan command for automated setup and resource publishing
+- `Page Content` section stub with customizable padding and max-width options
+- Default theme setting in `WorkbenchServiceProvider` for easier development
+
+### Changed
+
+- Comprehensive update to `README.md` with detailed installation, configuration, and usage guides
+
 ## [1.0.7] - 2026-03-15
 
 ### Added
