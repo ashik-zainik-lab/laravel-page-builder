@@ -1,14 +1,122 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Coderstm\PageBuilder\Services;
 
 use Coderstm\PageBuilder\Http\Controllers\WebPageController;
 use Coderstm\PageBuilder\PageBuilder;
+use Coderstm\PageBuilder\Registry\LayoutParser;
+use Coderstm\PageBuilder\Support\PageData;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 
 class PageService
 {
+    public function __construct(
+        protected readonly PageRenderer $pageRenderer,
+        protected readonly PageStorage $pageStorage,
+        protected readonly LayoutParser $layoutParser,
+        protected readonly EditorPreviewShell $editorPreviewShell,
+    ) {}
+
+    /**
+     * Resolve and render a page by slug, returning the appropriate HTTP response.
+     *
+     * Resolution order:
+     *   1. Editor mode  — always renders from the stored JSON (Blade views bypassed).
+     *   2. Custom Blade view  — view("pages.{slug}") if it exists.
+     *   3. Page builder JSON  — sections rendered through PageRenderer.
+     *   4. 404.
+     *
+     * @param  array<string, string|null>  $meta  Optional overrides for title, meta_title,
+     *                                            meta_description, meta_keywords.
+     */
+    public function render(string $slug, array $meta = []): mixed
+    {
+        if (! preg_match('/^[a-z0-9\-_]+$/i', $slug)) {
+            abort(404);
+        }
+
+        $dbPage = $this->findBySlug($slug);
+        $stored = $this->pageStorage->load($slug);
+        $layoutType = $stored?->layoutType() ?? 'page';
+        $defaultLayout = $this->layoutParser->defaultLayout($layoutType);
+
+        // Share the DB page model with all views rendered in this request,
+        // so section views (e.g. page-content) can access $page->title, $page->content, etc.
+        View::share('page', $dbPage);
+
+        // ── 1. Editor mode ────────────────────────────────────────────────
+        if (PageBuilder::editor()) {
+            $page = $this->buildPage($stored, $defaultLayout, $dbPage);
+
+            return view('pagebuilder::page', [
+                ...$this->pageMeta($dbPage, $page, $meta),
+                'slug' => $slug,
+                '__pb_content' => request()->boolean('pb-preview')
+                    ? $this->editorPreviewShell->render()
+                    : $this->pageRenderer->renderPage($page, editor: true),
+                '__pb_layout' => $page,
+            ]);
+        }
+
+        // ── 2. Custom Blade view ──────────────────────────────────────────
+        if (View::exists("pages.{$slug}")) {
+            return view("pages.{$slug}", [
+                ...$this->pageMeta($dbPage, $stored, $meta),
+                'slug' => $slug,
+            ]);
+        }
+
+        // ── 3. Page builder JSON ──────────────────────────────────────────
+        if ($stored !== null) {
+            $page = $this->buildPage($stored, $defaultLayout, $dbPage);
+
+            return view('pagebuilder::page', [
+                ...$this->pageMeta($dbPage, $page, $meta),
+                'slug' => $slug,
+                '__pb_content' => $this->pageRenderer->renderPage($page),
+                '__pb_layout' => $page,
+            ]);
+        }
+
+        // ── 4. Nothing found ──────────────────────────────────────────────
+        abort(404);
+    }
+
+    /**
+     * Build a PageData instance from stored JSON, merging the DB page title.
+     */
+    private function buildPage(?PageData $stored, array $defaultLayout, mixed $dbPage): PageData
+    {
+        $data = $stored?->toArray() ?? [];
+        $data['title'] = $dbPage?->title ?? $data['title'] ?? '';
+
+        return PageData::fromArray($data, $defaultLayout);
+    }
+
+    /**
+     * Extract SEO meta fields, with caller-supplied $meta taking highest precedence.
+     *
+     * Priority: $meta argument → DB record → stored JSON → null.
+     *
+     * @param  array<string, string|null>  $meta
+     * @return array{title: ?string, meta_title: ?string, meta_description: ?string, meta_keywords: ?string}
+     */
+    private function pageMeta(mixed $dbPage, ?PageData $stored = null, array $meta = []): array
+    {
+        $storedMeta = $stored?->meta() ?? [];
+
+        return [
+            'title' => $meta['title'] ?? $dbPage?->title ?? $stored?->title(),
+            'meta_title' => $meta['meta_title'] ?? $dbPage?->meta_title ?? $storedMeta['meta_title'] ?? null,
+            'meta_description' => $meta['meta_description'] ?? $dbPage?->meta_description ?? $storedMeta['meta_description'] ?? null,
+            'meta_keywords' => $meta['meta_keywords'] ?? $dbPage?->meta_keywords ?? $storedMeta['meta_keywords'] ?? null,
+        ];
+    }
+
     public function routes(): void
     {
         if (app()->routesAreCached()) {

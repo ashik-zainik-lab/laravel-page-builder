@@ -38,6 +38,7 @@ workbench:
       to: themes/default/views
 
 env:
+  - APP_NAME="My App"
   - CACHE_STORE=array
   - CACHE_DRIVER=array
   - SESSION_DRIVER=file

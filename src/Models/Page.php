@@ -12,19 +12,6 @@ class Page extends Model
 {
     use HasFactory, HasSlug;
 
-    protected static function booted()
-    {
-        static::saving(function ($page) {
-            if (PageBuilder::isPreservedPage($page->slug)) {
-                throw new \InvalidArgumentException("The slug '{$page->slug}' is reserved and cannot be used for dynamic pages.");
-            }
-        });
-    }
-
-    protected $logIgnore = [
-        'metadata',
-    ];
-
     protected $fillable = [
         'parent',
         'title',
@@ -61,5 +48,14 @@ class Page extends Model
         }
 
         return url($path);
+    }
+
+    protected static function booted()
+    {
+        static::saving(function ($page) {
+            if (PageBuilder::isPreservedPage($page->slug)) {
+                throw new \InvalidArgumentException("The slug '{$page->slug}' is reserved and cannot be used for dynamic pages.");
+            }
+        });
     }
 }

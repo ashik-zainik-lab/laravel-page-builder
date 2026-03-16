@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Coderstm\PageBuilder\Tests\Feature\Services;
 
-use Coderstm\PageBuilder\Facades\Page;
 use Coderstm\PageBuilder\Services\PageRenderer;
 use Coderstm\PageBuilder\Support\PageData;
 use Coderstm\PageBuilder\Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PageRendererTest extends TestCase
 {
+    use RefreshDatabase;
+
     private PageRenderer $pageRenderer;
 
     protected function setUp(): void
@@ -21,10 +23,6 @@ class PageRendererTest extends TestCase
 
     public function test_render_by_slug(): void
     {
-        Page::shouldReceive('findBySlug')
-            ->with('home')
-            ->andReturn(null);
-
         $this->get('/')->assertSee('Welcome Home');
     }
 

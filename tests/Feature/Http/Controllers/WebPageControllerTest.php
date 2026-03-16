@@ -5,49 +5,45 @@ declare(strict_types=1);
 namespace Coderstm\PageBuilder\Tests\Feature\Http\Controllers;
 
 use Coderstm\PageBuilder\Facades\Page;
-use Coderstm\PageBuilder\Services\PageRegistry;
-use Coderstm\PageBuilder\Tests\Stubs\PageStub;
 use Coderstm\PageBuilder\Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Workbench\App\Models\Page as ModelsPage;
 
 class WebPageControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
-     * Registers the layout-default route and returns a mocked DB page stub.
+     * Creates DB records for layout pages and registers their routes.
      *
-     * Uses the pre-existing workbench fixture:
-     *   workbench/storage/pages/layout-default.json
+     * Uses the pre-existing workbench fixture JSON files:
+     *   workbench/resources/views/pages/layout-default.json
+     *   workbench/resources/views/pages/layout-simple.json
      *
-     * Sections and layouts are resolved from workbench Blade views — no
-     * dynamic view creation is needed or allowed in this test.
+     * The PageObserver fires on create and calls pages:regenerate,
+     * which reloads the PageRegistry from the database automatically.
+     * Sections and layouts are resolved from workbench Blade views.
      */
     private function setUpLayoutTestPage(): void
     {
-        app(PageRegistry::class)->put([
-            'layout-default' => ['title' => 'A Test Page with Layout', 'slug' => 'layout-default'],
-            'layout-simple' => ['title' => 'A Test Page with Simple Layout', 'slug' => 'layout-simple'],
+        ModelsPage::factory()->create([
+            'slug' => 'layout-default',
+            'title' => 'A Test Page',
+            'meta_description' => 'Test description',
+            'meta_keywords' => 'test, page',
+            'content' => '<p>Hello from page content</p>',
+        ]);
+
+        ModelsPage::factory()->create([
+            'slug' => 'layout-simple',
+            'title' => 'A Test Page with Simple Layout',
+            'meta_description' => 'Test description',
+            'meta_keywords' => 'test, page',
+            'content' => '<p>Hello from page content</p>',
+
         ]);
 
         Page::routes();
-
-        Page::shouldReceive('findBySlug')
-            ->with('layout-default')
-            ->andReturn(new PageStub([
-                'title' => 'A Test Page',
-                'meta_title' => 'A Test Page | My App',
-                'meta_description' => 'Test description',
-                'meta_keywords' => 'test, page',
-                'content' => '<p>Hello from page content</p>',
-            ]));
-
-        Page::shouldReceive('findBySlug')
-            ->with('layout-simple')
-            ->andReturn(new PageStub([
-                'title' => 'A Test Page with Simple Layout',
-                'meta_title' => 'A Test Page with Simple Layout | My App',
-                'meta_description' => 'Test description',
-                'meta_keywords' => 'test, page',
-                'content' => '<p>Hello from page content</p>',
-            ]));
     }
 
     public function test_renders_page_with_layout_sections(): void
@@ -130,18 +126,14 @@ class WebPageControllerTest extends TestCase
 
     private function setUpPageWithContent(string $content = '<p>Hello from page content</p>'): void
     {
-        app(PageRegistry::class)->put([
-            'page-with-content' => ['title' => 'Page With Content', 'slug' => 'page-with-content'],
+        ModelsPage::create([
+            'slug' => 'page-with-content',
+            'title' => 'Page With Content',
+            'content' => $content,
+            'is_active' => true,
         ]);
 
         Page::routes();
-
-        Page::shouldReceive('findBySlug')
-            ->with('page-with-content')
-            ->andReturn(new PageStub([
-                'title' => 'Page With Content',
-                'content' => $content,
-            ]));
     }
 
     public function test_page_content_section_renders_page_content(): void
