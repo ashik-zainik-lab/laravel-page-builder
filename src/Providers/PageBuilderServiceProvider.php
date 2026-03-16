@@ -2,26 +2,17 @@
 
 namespace Coderstm\PageBuilder\Providers;
 
-use Coderstm\PageBuilder\Commands\RegeneratePages;
-use Coderstm\PageBuilder\Commands\ThemeLink;
-use Coderstm\PageBuilder\Facades\Block;
-use Coderstm\PageBuilder\Facades\Page;
-use Coderstm\PageBuilder\Facades\Section;
-use Coderstm\PageBuilder\Http\Middleware\RequestThemeMiddleware;
-use Coderstm\PageBuilder\Http\Middleware\ThemeMiddleware;
-use Coderstm\PageBuilder\Registry\BlockRegistry;
-use Coderstm\PageBuilder\Registry\LayoutParser;
-use Coderstm\PageBuilder\Registry\SchemaExtractor;
-use Coderstm\PageBuilder\Registry\SectionRegistry;
-use Coderstm\PageBuilder\Rendering\BladeDirectives;
-use Coderstm\PageBuilder\Rendering\Renderer;
+use Coderstm\PageBuilder\Commands;
+use Coderstm\PageBuilder\Facades;
+use Coderstm\PageBuilder\Http\Middleware;
+use Coderstm\PageBuilder\Registry;
+use Coderstm\PageBuilder\Rendering;
+use Coderstm\PageBuilder\Services;
 use Coderstm\PageBuilder\Services\PageRegistry;
 use Coderstm\PageBuilder\Services\PageRenderer;
-use Coderstm\PageBuilder\Services\PageService;
 use Coderstm\PageBuilder\Services\PageStorage;
-use Coderstm\PageBuilder\Services\Theme;
 use Coderstm\PageBuilder\Services\ThemeSettings;
-use Coderstm\PageBuilder\Support\Mix;
+use Coderstm\PageBuilder\Support;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
@@ -42,31 +33,31 @@ class PageBuilderServiceProvider extends ServiceProvider
         // ─── Core services ───────────────────────────────────────
 
         $this->app->singleton('page-service', function ($app) {
-            return $app->make(PageService::class);
+            return $app->make(Services\PageService::class);
         });
 
         $this->app->singleton('theme', function ($app) {
-            return new Theme;
+            return new Services\Theme;
         });
 
-        $this->app->singleton(Mix::class);
+        $this->app->singleton(Support\Mix::class);
 
         // ─── Schema extraction ───────────────────────────────────
 
-        $this->app->singleton(SchemaExtractor::class);
+        $this->app->singleton(Registry\SchemaExtractor::class);
 
         // ─── Registries ──────────────────────────────────────────
 
-        $this->app->singleton(SectionRegistry::class, function ($app) {
-            return new SectionRegistry($app->make(SchemaExtractor::class));
+        $this->app->singleton(Registry\SectionRegistry::class, function ($app) {
+            return new Registry\SectionRegistry($app->make(Registry\SchemaExtractor::class));
         });
 
-        $this->app->singleton(BlockRegistry::class, function ($app) {
-            return new BlockRegistry($app->make(SchemaExtractor::class));
+        $this->app->singleton(Registry\BlockRegistry::class, function ($app) {
+            return new Registry\BlockRegistry($app->make(Registry\SchemaExtractor::class));
         });
 
-        $this->app->singleton(LayoutParser::class, function ($app) {
-            return new LayoutParser($app->make(SectionRegistry::class));
+        $this->app->singleton(Registry\LayoutParser::class, function ($app) {
+            return new Registry\LayoutParser($app->make(Registry\SectionRegistry::class));
         });
 
         // ─── Page services ───────────────────────────────────────
@@ -77,16 +68,16 @@ class PageBuilderServiceProvider extends ServiceProvider
 
         // ─── Rendering ──────────────────────────────────────────
 
-        $this->app->singleton(Renderer::class, function ($app) {
-            return new Renderer(
-                $app->make(SectionRegistry::class),
-                $app->make(BlockRegistry::class),
+        $this->app->singleton(Rendering\Renderer::class, function ($app) {
+            return new Rendering\Renderer(
+                $app->make(Registry\SectionRegistry::class),
+                $app->make(Registry\BlockRegistry::class),
             );
         });
 
         $this->app->singleton(PageRenderer::class, function ($app) {
             return new PageRenderer(
-                $app->make(Renderer::class),
+                $app->make(Rendering\Renderer::class),
                 $app->make(PageStorage::class),
             );
         });
@@ -96,29 +87,29 @@ class PageBuilderServiceProvider extends ServiceProvider
     {
         // Register section paths from config
         if ($sections = config('pagebuilder.sections')) {
-            Section::add($sections);
+            Facades\Section::add($sections);
         }
 
         // Register block paths from config
         if ($blocks = config('pagebuilder.blocks')) {
-            Block::add($blocks);
+            Facades\Block::add($blocks);
         }
 
         // Set active theme
         if ($activeTheme = config('theme.active')) {
-            Theme::set($activeTheme);
+            Services\Theme::set($activeTheme);
         }
 
         // Register theme middleware
         /** @var \Illuminate\Foundation\Http\Kernel $kernel */
         $kernel = $this->app->make(Kernel::class);
-        $kernel->pushMiddleware(RequestThemeMiddleware::class);
-        Route::aliasMiddleware('theme', ThemeMiddleware::class);
+        $kernel->pushMiddleware(Middleware\RequestThemeMiddleware::class);
+        Route::aliasMiddleware('theme', Middleware\ThemeMiddleware::class);
 
         // Routes
         Route::middleware(config('pagebuilder.middleware', ['web']))
             ->group(function () {
-                Page::routes();
+                Facades\Page::routes();
                 $this->loadRoutesFrom(__DIR__.'/../../routes/web.php');
             });
 
@@ -145,15 +136,16 @@ class PageBuilderServiceProvider extends ServiceProvider
 
         // Commands
         $this->commands([
-            RegeneratePages::class,
-            ThemeLink::class,
+            Commands\InstallPageBuilder::class,
+            Commands\RegeneratePages::class,
+            Commands\ThemeLink::class,
         ]);
 
         // Share $theme globally with all Blade views
         View::share('theme', $this->app->make(ThemeSettings::class));
 
         // ─── Blade directives & precompiler ──────────────────────
-        BladeDirectives::register();
-        BladeDirectives::registerPrecompiler();
+        Rendering\BladeDirectives::register();
+        Rendering\BladeDirectives::registerPrecompiler();
     }
 }

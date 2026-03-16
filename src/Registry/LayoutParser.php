@@ -149,7 +149,7 @@ class LayoutParser
         foreach ($presetBlocks as $presetBlock) {
             $type = $presetBlock['type'] ?? 'block';
             $typeCounts[$type] = ($typeCounts[$type] ?? 0) + 1;
-            $id = $type . '_' . $typeCounts[$type];
+            $id = $type.'_'.$typeCounts[$type];
 
             $block = [
                 'type' => $type,

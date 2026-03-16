@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Coderstm\PageBuilder\Tests\Feature\Services;
 
+use Coderstm\PageBuilder\Facades\Page;
 use Coderstm\PageBuilder\Services\PageRenderer;
 use Coderstm\PageBuilder\Support\PageData;
 use Coderstm\PageBuilder\Tests\TestCase;
@@ -20,7 +21,7 @@ class PageRendererTest extends TestCase
 
     public function test_render_by_slug(): void
     {
-        \Coderstm\PageBuilder\Facades\Page::shouldReceive('findBySlug')
+        Page::shouldReceive('findBySlug')
             ->with('home')
             ->andReturn(null);
 

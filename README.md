@@ -41,13 +41,49 @@ composer require coderstm/laravel-page-builder
 
 The package auto-registers its service provider via Laravel's package discovery.
 
-### Publish Configuration
+### Run the install command
 
 ```bash
-php artisan vendor:publish --tag=pagebuilder-config
+php artisan pagebuilder:install
 ```
 
-This publishes `config/pagebuilder.php` with the following options:
+This single command:
+
+1. Publishes `config/pagebuilder.php`
+2. Publishes database migrations
+3. Publishes the compiled editor frontend assets to `public/pagebuilder/`
+4. Scaffolds default starter views into your app:
+   - `resources/views/layouts/page.blade.php` — base HTML layout
+   - `resources/views/sections/` — announcement, header, hero, rich-text, content, footer
+   - `resources/views/blocks/` — row, column, text
+
+**Options**
+
+| Flag | Description |
+| --- | --- |
+| `--force` | Overwrite files that already exist |
+| `--migrate` | Run `php artisan migrate` immediately after publishing |
+
+```bash
+# Overwrite existing files and run migrations in one step
+php artisan pagebuilder:install --force --migrate
+```
+
+### Run migrations (if not using `--migrate`)
+
+```bash
+php artisan migrate
+```
+
+### Build the section & block registry
+
+```bash
+php artisan page-builder:regenerate
+```
+
+### Configuration reference
+
+`config/pagebuilder.php` is published to your application's `config/` directory:
 
 ```php
 return [
@@ -74,23 +110,22 @@ return [
 ];
 ```
 
-### Publish Other Resources
+### Publish resources individually
+
+If you need to re-publish a specific resource:
 
 ```bash
-# Blade views (editor layout, built-in views)
-php artisan vendor:publish --tag=pagebuilder-views
+# Config
+php artisan vendor:publish --tag=pagebuilder-config
 
 # Database migrations
 php artisan vendor:publish --tag=pagebuilder-migrations
 
 # Editor frontend assets (React SPA)
 php artisan vendor:publish --tag=pagebuilder-assets
-```
 
-### Run Migrations
-
-```bash
-php artisan migrate
+# Built-in package views
+php artisan vendor:publish --tag=pagebuilder-views
 ```
 
 ---
@@ -669,22 +704,28 @@ Pages can define a `layout` key for per-page overrides of structural slots (head
     "order": ["hero"],
     "layout": {
         "type": "page",
-        "sections": {
-            "header": {
-                "type": "site-header",
-                "settings": { "sticky": true },
-                "blocks": {},
-                "order": [],
-                "disabled": false
-            },
-            "footer": {
-                "type": "site-footer",
-                "settings": {},
-                "blocks": {},
-                "order": [],
-                "disabled": false
+        "header": {
+            "sections": {
+                "header": {
+                    "type": "site-header",
+                    "settings": { "sticky": true },
+                    "blocks": {},
+                    "order": [],
+                    "disabled": false
+                }
             }
-        }
+        },
+        "footer": {
+            "sections": {
+                "footer": {
+                    "type": "site-footer",
+                    "settings": {},
+                    "blocks": {},
+                    "order": [],
+                    "disabled": false
+                }
+            }
+        },
     }
 }
 ```
@@ -692,12 +733,42 @@ Pages can define a `layout` key for per-page overrides of structural slots (head
 Render layout sections in your Blade layout file using `@sections()`:
 
 ```blade
-{{-- resources/views/layouts/app.blade.php --}}
-<body class="@pbEditorClass">
+{{-- resources/views/layouts/page.blade.php --}}
+<html class="dark" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="keywords" content="{{ $meta_keywords ?? '' }}" />
+    <meta name="description" content="{{ $meta_description ?? '' }}" />
+    <meta name="author" content="{{ $url ?? config('app.url') }}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+        {{ $meta_title ?? ($title ?? '') . ' | ' . config('app.name') }}
+    </title>
+    
+    <!-- Fonts and Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" />
+
+    ...
+
+    @stack('content_for_head')
+</head>
+
+<body class="page-layout overflow-x-hidden antialiased">
+
     @sections('header')
+
     @yield('content')
+
     @sections('footer')
 </body>
+
+</html>
+
 ```
 
 Layout sections are **non-sortable** — their position is determined by the Blade layout. In the editor they appear as fixed rows above and below the sortable page section list.
@@ -716,11 +787,21 @@ The package integrates with [qirolab/laravel-themer](https://github.com/qirolab/
 
 ### Register Theme Sections and Blocks
 
+If you're using a theme system you can set the active theme and the package will automatically register theme `sections` and `blocks` when the expected view paths exist. This is convenient when using a theme package or `qirolab/laravel-themer`.
+
 ```php
+use Coderstm\PageBuilder\Facades\Theme;
 use Coderstm\PageBuilder\Facades\Section;
 use Coderstm\PageBuilder\Facades\Block;
 
-// In a ThemeServiceProvider or AppServiceProvider boot() method:
+// Set the active theme (for example in a ThemeServiceProvider or middleware)
+Theme::set('my-theme');
+
+// The package will automatically register the following directories if they exist:
+//   themes/my-theme/views/sections
+//   themes/my-theme/views/blocks
+
+// If you need to register additional paths manually you can still call:
 Section::add(base_path('themes/my-theme/views/sections'));
 Block::add(base_path('themes/my-theme/views/blocks'));
 ```
@@ -768,11 +849,6 @@ Access theme settings in Blade views via the globally shared `$theme` variable:
 You can use the provided `ThemeMiddleware` to automatically apply themes based on route parameters or session data.
 
 ```php
-// bootstrap/app.php (Laravel 11+)
-$middleware->alias([
-    'theme' => \Coderstm\PageBuilder\Http\Middleware\ThemeMiddleware::class,
-]);
-
 // routes/web.php
 Route::get('/shop/{theme_slug}', function () {
     // ...
@@ -783,14 +859,14 @@ Route::get('/shop/{theme_slug}', function () {
 
 ## Artisan Commands
 
-```bash
-# Regenerate the page registry cache
-# Run this after adding, renaming, or removing page JSON files
-php artisan pages:regenerate
-
-# Symlink theme assets into the public directory
-php artisan theme:link
-```
+| Command | Description |
+| --- | --- |
+| `pagebuilder:install` | Publish config, migrations, assets, and scaffold starter views |
+| `pagebuilder:install --force` | Same as above, overwriting any existing files |
+| `pagebuilder:install --migrate` | Also run `php artisan migrate` after publishing |
+| `pages:regenerate` | Rebuild the page registry cache (run after adding/removing page JSON files) |
+| `theme:link` | Symlink theme asset directories into `public/themes/` |
+| `theme:link --force` | Overwrite existing symlinks |
 
 ---
 
