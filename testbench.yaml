@@ -21,10 +21,10 @@ workbench:
     commands: true
     components: false
     factories: true
-    views: true
   build:
     - sync-skeleton
     - asset-publish
+    - pagebuilder:install
     - create-sqlite-db
     - db-wipe
     - migrate-fresh
@@ -34,8 +34,8 @@ workbench:
     - from: storage
       to: workbench/storage
       reverse: true
-    - from: workbench/resources
-      to: resources
+    - from: workbench/resources/views
+      to: themes/default/views
 
 env:
   - CACHE_STORE=array

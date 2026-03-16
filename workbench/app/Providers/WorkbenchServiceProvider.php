@@ -2,6 +2,7 @@
 
 namespace Workbench\App\Providers;
 
+use Coderstm\PageBuilder\Facades\Theme;
 use Illuminate\Support\ServiceProvider;
 
 class WorkbenchServiceProvider extends ServiceProvider
@@ -19,6 +20,6 @@ class WorkbenchServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Theme::set('default');
     }
 }
