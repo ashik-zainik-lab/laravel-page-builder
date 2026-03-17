@@ -61,6 +61,9 @@ class Theme extends Base
         if ($blocksPath = self::path('views/blocks', $theme)) {
             Block::add($blocksPath);
         }
+
+        // Set theme settings configuration
+        Config::set('pagebuilder.theme_settings_path', self::path('theme-settings.json'));
     }
 
     /**
