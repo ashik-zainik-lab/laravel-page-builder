@@ -21,6 +21,7 @@ import RichTextField from "@/components/settings/fields/RichTextField";
 import ExternalField from "@/components/settings/fields/ExternalField";
 import FontAwesomeField from "@/components/settings/fields/FontAwesomeField";
 import MaterialIconField from "@/components/settings/fields/MaterialIconField";
+import GoogleFontField from "@/components/settings/fields/GoogleFontField";
 
 /**
  * Register a field type that renders a component inside a FieldWrapper.
@@ -172,6 +173,9 @@ export function registerCoreFields() {
     // 4b. Icon picker fields
     registerWrapped("icon_fa", FontAwesomeField);
     registerWrapped("icon_md", MaterialIconField);
+
+    // 4c. Google Font picker
+    registerWrapped("google_font", GoogleFontField);
 
     // 5. Register legacy or external dynamic config fields
     if (config.fields) {

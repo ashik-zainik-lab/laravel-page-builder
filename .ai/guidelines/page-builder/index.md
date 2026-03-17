@@ -149,5 +149,4 @@ use Coderstm\PageBuilder\Facades\Theme;     // → Theme service
 @blocks($block)           {{-- render all child blocks of a container block --}}
 @sections('header')       {{-- render a layout section slot --}}
 @pbEditorClass            {{-- adds editor class to <html> tag when in editor mode --}}
-@pbEditorScripts          {{-- injects editor interaction scripts --}}
 ```

@@ -7,10 +7,11 @@ import FieldRenderer from "./settings/fields/FieldRenderer";
  * Panel for editing global theme settings.
  * Reads themeSettings directly from the Zustand store and calls
  * editor.pages methods for mutations — no props required.
+ * Theme settings are saved alongside the page via the main Save button.
  */
 function ThemeSettingsPanel() {
     const editor = useEditorInstance();
-    const { themeSettings, saving } = useStore();
+    const { themeSettings } = useStore();
     const { schema, values } = themeSettings;
 
     const handleChange = useCallback(
@@ -38,44 +39,31 @@ function ThemeSettingsPanel() {
     }
 
     return (
-        <div className="flex flex-col h-full">
-            <div className="flex-1 overflow-y-auto sidebar-scroll">
-                {schema.map((group: any, groupIdx: number) => (
-                    <div key={group.name || `group-${groupIdx}`}>
-                        {group.name && (
-                            <div className="px-4 pt-4 pb-1">
-                                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                    {group.name}
-                                </h3>
-                            </div>
-                        )}
-
-                        <div className="px-4 py-3 border-b border-gray-100">
-                            {group.settings.map((setting: any, idx: number) => (
-                                <FieldRenderer
-                                    key={setting.id || `s-${groupIdx}-${idx}`}
-                                    setting={setting}
-                                    value={values?.[setting.id]}
-                                    onChange={(val) =>
-                                        handleChange(setting.id, val)
-                                    }
-                                />
-                            ))}
+        <div className="flex-1 overflow-y-auto sidebar-scroll">
+            {schema.map((group: any, groupIdx: number) => (
+                <div key={group.name || `group-${groupIdx}`}>
+                    {group.name && (
+                        <div className="px-4 pt-4 pb-1">
+                            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                {group.name}
+                            </h3>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    )}
 
-            <div className="shrink-0 px-4 py-3 border-t border-gray-200">
-                <button
-                    type="button"
-                    onClick={() => editor.pages.saveThemeSettings()}
-                    disabled={saving}
-                    className="w-full flex items-center justify-center gap-2 py-2 text-xs font-semibold text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                    {saving ? "Saving…" : "Save theme settings"}
-                </button>
-            </div>
+                    <div className="px-4 py-3 border-b border-gray-100">
+                        {group.settings.map((setting: any, idx: number) => (
+                            <FieldRenderer
+                                key={setting.id || `s-${groupIdx}-${idx}`}
+                                setting={setting}
+                                value={values?.[setting.id]}
+                                onChange={(val) =>
+                                    handleChange(setting.id, val)
+                                }
+                            />
+                        ))}
+                    </div>
+                </div>
+            ))}
         </div>
     );
 }

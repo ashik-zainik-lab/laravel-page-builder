@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Coderstm\PageBuilder\Rendering;
 
 use Coderstm\PageBuilder\PageBuilder;
+use Coderstm\PageBuilder\Services\ThemeSettings;
 use Coderstm\PageBuilder\Support\PageData;
 use Illuminate\Support\Facades\Blade;
 
@@ -61,6 +62,11 @@ PHP;
         Blade::directive('pbEditorClass', function () {
             return "<?php echo \Coderstm\PageBuilder\PageBuilder::class(); ?>";
         });
+
+        // @themeFont — emits Google Fonts <link> tags for any google_font settings
+        Blade::directive('themeFont', function () {
+            return '<?php echo \Coderstm\PageBuilder\Rendering\BladeDirectives::renderThemeFont(); ?>';
+        });
     }
 
     /**
@@ -90,6 +96,52 @@ PHP;
         $renderer = app(Renderer::class);
 
         return $renderer->renderRawSection($key, $raw, PageBuilder::editor());
+    }
+
+    /**
+     * Build Google Fonts <link> tags for every google_font setting in the theme schema.
+     *
+     * Uses the saved value when available, falls back to the setting default.
+     * Returns an empty string when no google_font settings are configured.
+     */
+    public static function renderThemeFont(): string
+    {
+        $themeSettings = app(ThemeSettings::class);
+        $values        = $themeSettings->values();
+        $fonts         = [];
+
+        foreach ($themeSettings->schema() as $group) {
+            foreach ($group['settings'] ?? [] as $setting) {
+                if (($setting['type'] ?? '') !== 'google_font') {
+                    continue;
+                }
+
+                $family = $values[$setting['id']] ?? ($setting['default'] ?? null);
+
+                if ($family) {
+                    $fonts[] = $family;
+                }
+            }
+        }
+
+        $fonts = array_unique($fonts);
+
+        if (empty($fonts)) {
+            return '';
+        }
+
+        $query = implode('&', array_map(
+            static fn (string $f) => 'family=' . rawurlencode($f) . ':wght@400;500;600;700',
+            $fonts
+        ));
+
+        $href = 'https://fonts.googleapis.com/css2?' . $query . '&display=swap';
+
+        return implode("\n", [
+            '<link rel="preconnect" href="https://fonts.googleapis.com">',
+            '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>',
+            '<link href="' . e($href) . '" rel="stylesheet">',
+        ]);
     }
 
     /**

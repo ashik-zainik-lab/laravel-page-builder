@@ -45,8 +45,8 @@ const api = {
     /**
      * Save a page (sections + meta).
      */
-    async savePage(slug: string, data: any, meta?: any) {
-        return post<any>(`${config.baseUrl}/save-page`, { slug, data, meta });
+    async savePage(slug: string, data: any, meta?: any, themeSettings?: Record<string, any>) {
+        return post<any>(`${config.baseUrl}/save-page`, { slug, data, meta, theme_settings: themeSettings });
     },
 
     /**

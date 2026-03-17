@@ -184,7 +184,9 @@ export const createPageSlice: StateCreator<
     loadSections: async () => {
         if (Object.keys(config.sections || {}).length > 0) {
             set({ sections: config.sections });
-            return;
+        }
+        if (config.themeSettings) {
+            set({ themeSettings: config.themeSettings });
         }
     },
 
@@ -256,7 +258,7 @@ export const createPageSlice: StateCreator<
                 },
             };
 
-            await api.savePage(state.currentSlug, payload, state.pageMeta);
+            await api.savePage(state.currentSlug, payload, state.pageMeta, state.themeSettings.values);
         } catch (err) {
             console.error("Failed to save:", err);
         } finally {

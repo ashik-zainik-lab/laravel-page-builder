@@ -64,7 +64,17 @@ return [
     |
     */
 
-    'theme_settings_schema' => [],
+    'theme_settings_schema' => [
+        [
+            'name' => 'Colors',
+            'settings' => [
+                [
+                    'id' => 'primary_color', 'type' => 'color', 'label' => 'Primary', 'default' => '#3B82F6'],
+                [
+                    'id' => 'font_family',   'type' => 'google_font', 'label' => 'Font', 'default' => 'sans'],
+            ],
+        ],
+    ],
 
     'theme_settings_path' => resource_path('theme-settings.json'),
 

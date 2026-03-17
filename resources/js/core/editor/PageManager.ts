@@ -75,7 +75,7 @@ export class PageManager {
         this.events.emit("page:loaded", { slug });
     }
 
-    /** Save the current page. */
+    /** Save the current page (includes theme settings in the same request). */
     async save(): Promise<void> {
         await useStore.getState().savePage();
         const slug = useStore.getState().currentSlug;

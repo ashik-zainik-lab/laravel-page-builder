@@ -26,10 +26,6 @@ Used in layout files to render specific layout zones (e.g., header, footer).
 @sections('header')
 ```
 
-### `@pbEditorScripts`
-
-Injects the necessary JavaScript for the editor's live preview. Place this in your theme's main layout file before the closing `</body>` tag.
-
 ### `@pbEditorClass`
 
 Outputs a CSS class if the page is currently being viewed inside the editor.

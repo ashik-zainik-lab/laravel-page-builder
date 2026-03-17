@@ -43,7 +43,3 @@ public function boot()
     Section::add(resource_path('views/theme/sections'));
 }
 ```
-
-## Editor Scripts
-
-In your layout file, use the `@pbEditorScripts` directive to inject the necessary JS for the live editor preview functionality.

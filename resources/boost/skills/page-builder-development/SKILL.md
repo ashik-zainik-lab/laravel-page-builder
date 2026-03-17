@@ -40,7 +40,6 @@ Five layers — dependencies flow **downward only**:
 | `@blocks($block)` | Renders all child blocks of a container block |
 | `@sections('header')` | Renders a layout slot (header / footer) |
 | `@pbEditorClass` | Adds `js pb-design-mode` to `<html>` in editor mode |
-| `@pbEditorScripts` | Injects editor interaction scripts in editor mode |
 
 > Never call `@blocks()` outside a Blade view. Never call the renderer directly from a template.
 

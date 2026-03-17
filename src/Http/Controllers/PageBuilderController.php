@@ -159,19 +159,20 @@ class PageBuilderController extends Controller
     public function savePage(Request $request): JsonResponse
     {
         $request->validate([
-            'slug' => 'required|string|alpha_dash',
-            'data' => 'required|array',
-            'meta' => 'nullable|array',
-            'meta.title' => 'nullable|string|max:255',
-            'meta.meta_title' => 'nullable|string|max:255',
+            'slug'                  => 'required|string|alpha_dash',
+            'data'                  => 'required|array',
+            'meta'                  => 'nullable|array',
+            'meta.title'            => 'nullable|string|max:255',
+            'meta.meta_title'       => 'nullable|string|max:255',
             'meta.meta_description' => 'nullable|string|max:500',
-            'meta.meta_keywords' => 'nullable|string|max:255',
+            'meta.meta_keywords'    => 'nullable|string|max:255',
+            'theme_settings'        => 'nullable|array',
         ]);
 
         $slug = $request->input('slug');
         $data = array_merge($request->input('data'), [
             'title' => $request->input('meta.title'),
-            'meta' => $request->input('meta'),
+            'meta'  => $request->input('meta'),
         ]);
 
         $saved = $this->pageStorage->save($slug, $data);
@@ -187,11 +188,16 @@ class PageBuilderController extends Controller
 
         if (! empty($meta)) {
             Page::saveMeta($slug, array_filter([
-                'title' => $meta['title'] ?? null,
-                'meta_title' => $meta['meta_title'] ?? null,
+                'title'            => $meta['title'] ?? null,
+                'meta_title'       => $meta['meta_title'] ?? null,
                 'meta_description' => $meta['meta_description'] ?? null,
-                'meta_keywords' => $meta['meta_keywords'] ?? null,
+                'meta_keywords'    => $meta['meta_keywords'] ?? null,
             ], fn ($v) => $v !== null));
+        }
+
+        // Save theme settings when included in the same request
+        if ($request->has('theme_settings')) {
+            $this->themeSettings->save($request->input('theme_settings', []));
         }
 
         return response()->json([

@@ -72,9 +72,6 @@ The master layout integrates layout sections (header/footer) and yields the page
 
     {{-- Theme assets --}}
     {{ theme_vite(['css/theme.css', 'js/theme.js']) }}
-
-    {{-- Editor scripts (injected automatically in editor mode) --}}
-    @pbEditorScripts
 </head>
 <body>
 
@@ -96,7 +93,6 @@ The master layout integrates layout sections (header/footer) and yields the page
 | Directive | Purpose |
 |---|---|
 | `@pbEditorClass` | Adds `js pb-design-mode` class to `<html>` in editor mode |
-| `@pbEditorScripts` | Injects editor interaction scripts in editor mode |
 | `@sections('header')` | Renders the `header` layout section |
 | `@sections('footer')` | Renders the `footer` layout section |
 | `@yield('content')` | Where the page's sections are output |

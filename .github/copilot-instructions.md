@@ -51,7 +51,7 @@ packages/page-builder/
 │   ├── Rendering/           # Layer 4: RENDERING — Blade rendering pipeline
 │   │   ├── Renderer.php         # Core engine: hydrates JSON → objects, renders via Blade
 │   │   ├── EditorAttributes.php # Generates data-editor-* attributes for sections/blocks
-│   │   └── BladeDirectives.php  # Registers @blocks, @schema, @pbEditorScripts, @pbEditorClass
+│   │   └── BladeDirectives.php  # Registers @blocks, @schema, @pbEditorClass
 │   │
 │   ├── Services/            # High-level orchestrators for pages
 │   │   ├── PageRenderer.php     # Loads page JSON, renders all sections, publishes to Blade
