@@ -109,6 +109,11 @@ export class PreviewManager {
         this.messageBus?.send("update-css-var", { cssVar, value });
     }
 
+    /** Set multiple CSS custom properties in a single message. */
+    updateCssVars(vars: Record<string, string>): void {
+        this.messageBus?.send("update-css-vars", { vars });
+    }
+
     /** Remove a section from the iframe DOM. */
     removeSection(sectionId: string): void {
         this.messageBus?.send("remove-section", { sectionId });

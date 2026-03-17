@@ -12,4 +12,5 @@ export {
     Undo2 as UndoIcon,
     Redo2 as RedoIcon,
     Crosshair as InspectorIcon,
+    RotateCcw as ResetIcon,
 } from "lucide-react";

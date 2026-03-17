@@ -907,8 +907,13 @@ export const EDITOR_JS = `
         }
 
         if (msg.type === 'update-css-var') {
-            console.log(msg)
             document.documentElement.style.setProperty(msg.cssVar, msg.value);
+        }
+
+        if (msg.type === 'update-css-vars') {
+            for (const [cssVar, value] of Object.entries(msg.vars)) {
+                document.documentElement.style.setProperty(cssVar, value);
+            }
         }
     });
 

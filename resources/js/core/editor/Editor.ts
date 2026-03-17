@@ -1,4 +1,5 @@
 import { EventBus } from "./EventBus";
+import type { SettingSchema } from "@/types/page-builder";
 import { SectionManager } from "./SectionManager";
 import { BlockManager } from "./BlockManager";
 import { SelectionManager } from "./SelectionManager";
@@ -263,9 +264,18 @@ export class Editor {
 
         this.events.on(
             "theme:setting-changed",
-            ({ cssVar, value }: { cssVar: string | null; value: any }) => {
+            ({ cssVar, value }: { cssVar: string | null; value: SettingSchema["default"] }) => {
                 if (cssVar) {
                     this.preview.updateCssVar(cssVar, value);
+                }
+            }
+        );
+
+        this.events.on(
+            "theme:settings-reset",
+            ({ cssVars }: { cssVars: Record<string, string> }) => {
+                if (Object.keys(cssVars).length > 0) {
+                    this.preview.updateCssVars(cssVars);
                 }
             }
         );

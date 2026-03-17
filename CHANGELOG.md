@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-03-17
+
+### Added
+
+- Google Fonts integration with a new `GoogleFontField` and a comprehensive library of fonts
+- `css_var` field on theme setting schema entries — the editor now syncs the declared CSS custom property to the preview iframe in real time as values change
+- Per-setting reset icon in the Theme Settings panel (appears on hover when a value differs from its default)
+- **Reset all** button in the Theme Settings panel header to restore every setting to its schema default in one action
+- `resetThemeSetting(key)` and `resetAllThemeSettings()` methods on `PageManager`
+- `updateCssVars(vars)` batch method on `PreviewManager` for single-message bulk CSS var updates
+- `update-css-vars` message handler in `EditorPreviewRuntime` for batch CSS custom property application
+
+### Changed
+
+- `resetAllThemeSettings` uses a single `setThemeSettingsValues` store update and emits one `theme:settings-reset` event instead of N individual calls, avoiding N preview postMessages
+- `updateThemeSetting` extracts a private `findSchemaSetting` helper shared with `resetThemeSetting`, eliminating duplicated schema traversal loops
+- `ThemeSettingsPanel` now uses `ThemeSettingsGroup` and `SettingSchema` types instead of `any`, and imports `ResetIcon` from the shared icon registry
+
+### Refactored
+
+- Standardized theme setting keys in `ThemeSettingsPanel` for better consistency
+- Improved code structure and readability in core editor components and services
+- Enhanced page saving functionality within `PageManager`
+
 ## [1.0.9] - 2026-03-16
 
 ### Added

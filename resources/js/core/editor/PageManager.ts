@@ -1,6 +1,6 @@
 import { useStore } from "@/core/store/useStore";
 import type { EventBus } from "./EventBus";
-import type { PageMeta, ThemeSettingsData } from "@/types/page-builder";
+import type { PageMeta, SettingSchema, ThemeSettingsData } from "@/types/page-builder";
 
 /**
  * PageManager — encapsulates page-level operations.
@@ -94,50 +94,57 @@ export class PageManager {
     }
 
     /** Update a single theme setting value. */
-    updateThemeSetting(key: string, value: any): void {
+    updateThemeSetting(key: string, value: SettingSchema["default"]): void {
         useStore.getState().updateThemeSettingValue(key, value);
-
-        // Resolve the css_var declared on the matching setting schema entry.
-        const { schema } = useStore.getState().themeSettings;
-        let cssVar: string | null = null;
-        outer: for (const group of schema) {
-            for (const setting of group.settings) {
-                if ((setting.key ?? setting.id) === key) {
-                    cssVar = setting.css_var ?? null;
-                    break outer;
-                }
-            }
-        }
-
-        this.events.emit("theme:setting-changed", { key, value, cssVar });
+        const setting = this.findSchemaSetting(key);
+        this.events.emit("theme:setting-changed", {
+            key,
+            value,
+            cssVar: setting?.css_var ?? null,
+        });
     }
 
     /** Reset a single theme setting to its schema default. */
     resetThemeSetting(key: string): void {
+        const setting = this.findSchemaSetting(key);
+        if (setting?.default !== undefined) {
+            this.updateThemeSetting(key, setting.default);
+        }
+    }
+
+    /** Reset every theme setting to its schema default and sync preview in one pass. */
+    resetAllThemeSettings(): void {
+        const { schema } = useStore.getState().themeSettings;
+        const defaults: Record<string, SettingSchema["default"]> = {};
+        const cssVars: Record<string, string> = {};
+
+        for (const group of schema) {
+            for (const setting of group.settings) {
+                if (setting.default === undefined) continue;
+                const key = setting.key ?? setting.id;
+                defaults[key] = setting.default;
+                if (setting.css_var) {
+                    cssVars[setting.css_var] = setting.default;
+                }
+            }
+        }
+
+        useStore.getState().setThemeSettingsValues(defaults);
+        this.events.emit("theme:settings-reset", { cssVars });
+    }
+
+    /* ── Private helpers ─────────────────────────────────────────────── */
+
+    private findSchemaSetting(key: string): SettingSchema | undefined {
         const { schema } = useStore.getState().themeSettings;
         for (const group of schema) {
             for (const setting of group.settings) {
                 if ((setting.key ?? setting.id) === key) {
-                    if (setting.default !== undefined) {
-                        this.updateThemeSetting(key, setting.default);
-                    }
-                    return;
+                    return setting;
                 }
             }
         }
-    }
-
-    /** Reset every theme setting to its schema default. */
-    resetAllThemeSettings(): void {
-        const { schema } = useStore.getState().themeSettings;
-        for (const group of schema) {
-            for (const setting of group.settings) {
-                const key = setting.key ?? setting.id;
-                if (setting.default !== undefined) {
-                    this.updateThemeSetting(key, setting.default);
-                }
-            }
-        }
+        return undefined;
     }
 
     /** Save theme settings to the API. */

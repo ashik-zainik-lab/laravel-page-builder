@@ -950,41 +950,111 @@ Block::add(base_path('themes/my-theme/views/blocks'));
 
 ### Global Theme Settings
 
-Define global design tokens (colors, fonts, spacing) in `config/pagebuilder.php`:
+Define global design tokens (colors, fonts, spacing) in `config/pagebuilder.php`. Settings are grouped for display in the editor's Theme Settings panel:
 
 ```php
 'theme_settings_schema' => [
     [
-        'id'      => 'primary_color',
-        'type'    => 'color',
-        'label'   => 'Primary Color',
-        'default' => '#3B82F6',
+        'name' => 'Colors',
+        'settings' => [
+            [
+                'key'     => 'colors.primary',
+                'label'   => 'Primary',
+                'type'    => 'color',
+                'default' => '#10b981',
+                'css_var' => '--colors-primary',
+            ],
+            [
+                'key'     => 'colors.background_dark',
+                'label'   => 'Background (dark)',
+                'type'    => 'color',
+                'default' => '#0f0f0f',
+                'css_var' => '--colors-background-dark',
+            ],
+        ],
     ],
     [
-        'id'      => 'font_family',
-        'type'    => 'select',
-        'label'   => 'Font Family',
-        'default' => 'sans',
-        'options' => [
-            ['value' => 'sans',  'label' => 'Sans Serif'],
-            ['value' => 'serif', 'label' => 'Serif'],
-            ['value' => 'mono',  'label' => 'Monospace'],
+        'name' => 'Typography',
+        'settings' => [
+            [
+                'key'     => 'fonts.body',
+                'label'   => 'Body font',
+                'type'    => 'google_font',
+                'default' => 'Inter, sans-serif',
+                'css_var' => '--fonts-body',
+            ],
+        ],
+    ],
+    [
+        'name' => 'Radius & Shape',
+        'settings' => [
+            [
+                'key'     => 'radius.base',
+                'label'   => 'Radius (base)',
+                'type'    => 'text',
+                'default' => '0.25rem',
+                'css_var' => '--radius-base',
+            ],
         ],
     ],
 ],
 ```
 
-Access theme settings in Blade views via the globally shared `$theme` variable:
+**Schema fields**
+
+| Field     | Required | Description                                                                 |
+| --------- | -------- | --------------------------------------------------------------------------- |
+| `key`     | Yes      | Dot-notation key used to store and retrieve the value (`colors.primary`)    |
+| `type`    | Yes      | Field type: `color`, `text`, `select`, `google_font`, etc.                  |
+| `label`   | Yes      | Human-readable label shown in the editor panel                              |
+| `default` | Yes      | Fallback value used when no override has been saved                         |
+| `css_var` | No       | CSS custom property (e.g. `--colors-primary`) updated live in the preview   |
+
+**`css_var` — live preview sync**
+
+When a `css_var` is declared on a setting, the editor updates that CSS custom property on the preview iframe's `:root` in real time as the user types — no page reload required. Declare your tokens in your theme stylesheet to consume them:
+
+```css
+:root {
+    --colors-primary: #10b981;
+    --fonts-body: Inter, sans-serif;
+    --radius-base: 0.25rem;
+}
+
+.btn-primary  { background-color: var(--colors-primary); }
+body          { font-family: var(--fonts-body); }
+.card         { border-radius: var(--radius-base); }
+```
+
+**`google_font` setting type**
+
+Use `type: 'google_font'` to let editors pick a Google Font from a curated library. The selected font is automatically injected as a `<link>` tag in the page `<head>` via the `@pbThemeFont` Blade directive:
+
+```blade
+{{-- in your layout <head> --}}
+@pbThemeFont
+```
+
+**Accessing values in Blade**
+
+`$theme` is a `ThemeSettings` instance shared with all Blade views:
 
 ```blade
 <style>
     :root {
-        --primary: {{ $theme->primary_color ?? '#3B82F6' }};
+        --colors-primary: {{ $theme->get('colors.primary', '#10b981') }};
+        --fonts-body: {{ $theme->get('fonts.body', 'Inter, sans-serif') }};
     }
 </style>
 ```
 
-`$theme` is a `ThemeSettings` instance shared with all Blade views. Use property-style access (`$theme->key`) or the `get()` helper with a default (`$theme->get('key', 'default')`).
+Use `$theme->get('key', 'default')` for dot-notation access with a fallback, or `$theme->key` for top-level keys.
+
+**Editor reset options**
+
+In the Theme Settings panel editors can:
+- **Reset individual setting** — hover a setting row and click the reset icon to restore its `default` value.
+- **Reset all** — click **Reset all** in the panel header to restore every setting to its schema default in one action. Both reset paths trigger live CSS var updates immediately.
 
 ### Theme Middleware
 

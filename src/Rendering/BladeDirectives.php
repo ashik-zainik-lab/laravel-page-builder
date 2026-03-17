@@ -107,8 +107,8 @@ PHP;
     public static function renderThemeFont(): string
     {
         $themeSettings = app(ThemeSettings::class);
-        $values        = $themeSettings->values();
-        $fonts         = [];
+        $values = $themeSettings->values();
+        $fonts = [];
 
         foreach ($themeSettings->schema() as $group) {
             foreach ($group['settings'] ?? [] as $setting) {
@@ -131,16 +131,16 @@ PHP;
         }
 
         $query = implode('&', array_map(
-            static fn (string $f) => 'family=' . rawurlencode($f) . ':wght@400;500;600;700',
+            static fn (string $f) => 'family='.rawurlencode($f).':wght@400;500;600;700',
             $fonts
         ));
 
-        $href = 'https://fonts.googleapis.com/css2?' . $query . '&display=swap';
+        $href = 'https://fonts.googleapis.com/css2?'.$query.'&display=swap';
 
         return implode("\n", [
             '<link rel="preconnect" href="https://fonts.googleapis.com">',
             '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>',
-            '<link href="' . e($href) . '" rel="stylesheet">',
+            '<link href="'.e($href).'" rel="stylesheet">',
         ]);
     }
 
