@@ -67,9 +67,12 @@ class PageService
 
         // ── 2. Custom Blade view ──────────────────────────────────────────
         if (View::exists("pages.{$slug}")) {
+            $page = $this->buildPage($stored, $defaultLayout, $dbPage);
+
             return view("pages.{$slug}", [
                 ...$this->pageMeta($dbPage, $stored, $meta),
                 'slug' => $slug,
+                '__pb_layout' => $page,
             ]);
         }
 

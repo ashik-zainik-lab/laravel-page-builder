@@ -123,6 +123,52 @@ class WebPageControllerTest extends TestCase
         // exercised by the page-content section when included in a page JSON.
         $response->assertStatus(200);
     }
+    
+    public function test_sections_directive_renders_with_default_layout_on_custom_route(): void
+    {
+        // No DB record, no Page::routes() — purely a custom Route::get() in workbench/routes/web.php
+        // that calls view('pages.custom-blade') directly.
+        $response = $this->get('/custom-route');
+
+        $response->assertOk();
+
+        $html = $response->getContent();
+
+        // Body content proves the view rendered at all.
+        $this->assertStringContainsString('Custom blade page body', $html);
+
+        // @sections('header') must render — falls back to header preset 'My Site Header'.
+        $this->assertStringContainsString('My Site Header', $html);
+
+        // @sections('footer') must render — falls back to footer preset 'Quick Links'.
+        $this->assertStringContainsString('Quick Links', $html);
+    }
+
+    public function test_sections_directive_renders_with_default_layout_when_using_custom_blade_view(): void
+    {
+        ModelsPage::factory()->create([
+            'slug'  => 'custom-blade',
+            'title' => 'Custom Blade Page',
+        ]);
+
+        Page::routes();
+
+        $response = $this->get(route('pages.custom-blade'));
+
+        $response->assertOk();
+
+        $html = $response->getContent();
+
+        // The custom Blade body must appear (sanity check that the view rendered).
+        $this->assertStringContainsString('Custom blade page body', $html);
+
+        // @sections('header') must render — header.blade.php preset title = 'My Site Header'.
+        // Before the fix $__pb_layout was null → renderLayoutSection() returned ''.
+        $this->assertStringContainsString('My Site Header', $html);
+
+        // @sections('footer') must render — footer.blade.php preset includes 'Quick Links'.
+        $this->assertStringContainsString('Quick Links', $html);
+    }
 
     private function setUpPageWithContent(string $content = '<p>Hello from page content</p>'): void
     {

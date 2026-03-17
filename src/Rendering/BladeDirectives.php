@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Coderstm\PageBuilder\Rendering;
 
 use Coderstm\PageBuilder\PageBuilder;
+use Coderstm\PageBuilder\Registry\LayoutParser;
 use Coderstm\PageBuilder\Services\ThemeSettings;
 use Coderstm\PageBuilder\Support\PageData;
 use Illuminate\Support\Facades\Blade;
@@ -83,7 +84,11 @@ PHP;
         string $key,
     ): string {
         if ($layout === null) {
-            return '';
+            // No $__pb_layout was injected — e.g. a custom route called view() directly
+            // without going through PageService. Build the default 'page' layout so that
+            // @sections('header') / @sections('footer') still render with schema defaults.
+            $defaultData = app(LayoutParser::class)->defaultLayout('page');
+            $layout = PageData::fromArray([], $defaultData);
         }
 
         $raw = $layout->layoutSection($key);
