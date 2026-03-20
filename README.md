@@ -20,7 +20,7 @@ It includes a visual editor, layout system, reusable sections and multi-theme su
 - **`@schema()` directive** — declare settings, child blocks, and presets directly in Blade templates
 - **Visual editor** — React SPA with iframe live preview, drag-and-drop, and inline text editing
 - **JSON-based storage** — page data stored as JSON files on disk for fast reads and easy version control
-- **JSON templates** — Shopify-style fallback layouts for pages without a per-page JSON; supports `wrapper`, variable interpolation (`{{ $page->title }}`), and theme overrides
+- **JSON templates** — fallback layouts for pages without a per-page JSON; supports `wrapper`, variable interpolation (`{{ $page->title }}`), and theme overrides
 - **Per-page Layouts** — site header and footer are configurable per-page, stored in the page JSON
 - **Recursive block nesting** — container blocks (rows, columns) can hold child blocks to any depth
 - **Theme blocks** — register global block types that any section can accept via `@theme` wildcard
@@ -366,7 +366,7 @@ Pages are stored as JSON files in the configured pages directory. Each page cont
 
 ## Templates
 
-Templates are **JSON fallback layouts** for pages that have no per-page page builder JSON file and no custom Blade view. Inspired by Shopify's JSON template system, they let you define a single file that controls which sections a whole category of pages renders — without requiring a separate `pages/{slug}.json` for every page.
+Templates are **JSON fallback layouts** for pages that have no per-page page builder JSON file and no custom Blade view. They let you define a single file that controls which sections a whole category of pages renders — without requiring a separate `pages/{slug}.json` for every page.
 
 ### Page resolution order
 

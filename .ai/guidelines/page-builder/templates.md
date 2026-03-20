@@ -4,7 +4,7 @@
 
 ## Overview
 
-Templates are **JSON fallback layouts** for pages that have no per-page JSON file (`pages/{slug}.json`) and no custom Blade view (`pages/{slug}.blade.php`). They work like Shopify's JSON templates: a single JSON file defines the sections, render order, optional wrapper element, and layout type for any page that uses it.
+Templates are **JSON fallback layouts** for pages that have no per-page JSON file (`pages/{slug}.json`) and no custom Blade view (`pages/{slug}.blade.php`). A single JSON file defines the sections, render order, optional wrapper element, and layout type for any page that uses it.
 
 A page selects its template via the `template` column on the `Page` model. When no template is selected, the default `page.json` template is used.
 

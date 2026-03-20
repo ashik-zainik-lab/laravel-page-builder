@@ -535,7 +535,7 @@ The **Layer Panel** is the left sidebar in the editor that shows a hierarchical 
 
 - Sections appear as collapsible top-level rows
 - Blocks (and nested child blocks) appear indented beneath their parent section or container block
-- The panel uses a **text-colour-only** hover style — no background changes on hover (Shopify-style): hovering a row changes the label and icon text colour, never the row background
+- The panel uses a **text-colour-only** hover style — no background changes on hover: hovering a row changes the label and icon text colour, never the row background
 - The currently selected section or block is highlighted with a blue label (`text-blue-600`) with no background colour change
 
 ### Inline Rename

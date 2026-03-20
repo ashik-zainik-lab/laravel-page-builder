@@ -7,7 +7,7 @@
 
 ## Overview
 
-The Page Builder is a multi-theme, JSON-driven page composition system inspired by Shopify's theme architecture. Pages are assembled from **sections** (structural containers) and **blocks** (reusable content elements), all driven by a **Page JSON** document stored per page.
+The Page Builder is a multi-theme, JSON-driven page composition system. Pages are assembled from **sections** (structural containers) and **blocks** (reusable content elements), all driven by a **Page JSON** document stored per page.
 
 ---
 
