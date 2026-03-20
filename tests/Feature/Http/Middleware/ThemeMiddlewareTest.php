@@ -3,13 +3,14 @@
 namespace Coderstm\PageBuilder\Tests\Feature\Http\Middleware;
 
 use Coderstm\PageBuilder\Facades\Theme;
+use Coderstm\PageBuilder\Http\Middleware\RequestThemeMiddleware;
 use Coderstm\PageBuilder\Tests\TestCase;
 
 class ThemeMiddlewareTest extends TestCase
 {
     protected function defineRoutes($router)
     {
-        $router->get('/foo', function () {
+        $router->middleware([RequestThemeMiddleware::class])->get('/foo', function () {
             return Theme::active();
         });
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Coderstm\PageBuilder\Tests\Feature\Http;
 
 use Coderstm\PageBuilder\Http\Controllers\WebPageController;
+use Coderstm\PageBuilder\Http\Middleware\RequestThemeMiddleware;
 use Coderstm\PageBuilder\Services\PageCache;
 use Coderstm\PageBuilder\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -33,7 +34,8 @@ class MultiThemePageTest extends TestCase
 
     protected function defineRoutes($router): void
     {
-        $router->get('/shop', [WebPageController::class, 'pages'])
+        $router->middleware([RequestThemeMiddleware::class])
+            ->get('/shop', [WebPageController::class, 'pages'])
             ->defaults('slug', 'shop');
     }
 

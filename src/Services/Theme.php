@@ -47,6 +47,10 @@ class Theme extends Base
 
         self::finder()->setActiveTheme($theme, $parentTheme);
 
+        if (!File::exists(self::finder()->getThemePath($theme))) {
+            return;
+        }
+
         // Load theme translations from the theme's lang directory
         self::loadTranslations($theme);
 
@@ -176,7 +180,7 @@ class Theme extends Base
             $asset = "/{$asset}";
         }
 
-        $path = $mixPath.$asset;
+        $path = $mixPath . $asset;
 
         return $absolute ? $path : url($path);
     }

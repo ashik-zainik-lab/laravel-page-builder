@@ -16,7 +16,6 @@ use Coderstm\PageBuilder\Services\ThemeSettings;
 use Coderstm\PageBuilder\Support;
 use Coderstm\PageBuilder\Support\TemplateVariableResolver;
 use Coderstm\PageBuilder\Support\WrapperParser;
-use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -113,9 +112,6 @@ class PageBuilderServiceProvider extends ServiceProvider
         }
 
         // Register theme middleware
-        /** @var \Illuminate\Foundation\Http\Kernel $kernel */
-        $kernel = $this->app->make(Kernel::class);
-        $kernel->pushMiddleware(Middleware\RequestThemeMiddleware::class);
         Route::aliasMiddleware('theme', Middleware\ThemeMiddleware::class);
 
         // Public Page routes
