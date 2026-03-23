@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
 Route::prefix('pagebuilder')->as('pagebuilder.')->group(function () {
     Route::get('pages', [PageBuilderController::class, 'pages'])->name('pages');
     Route::get('page/{slug?}', [PageBuilderController::class, 'page'])->defaults('slug', 'home')->name('page');
