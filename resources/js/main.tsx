@@ -18,92 +18,92 @@ let editorInstance: Editor | null = null;
 registerCoreFields();
 
 const PageBuilder = {
-    init(
-        configParams: Partial<EditorConfig> &
-            Partial<PageBuilderConfig> & {
-                container?: string | HTMLElement;
-                basename?: string;
-            } = {}
-    ) {
-        // Set the internal configuration store
-        setConfig(configParams);
+  init(
+    configParams: Partial<EditorConfig> &
+      Partial<PageBuilderConfig> & {
+        container?: string | HTMLElement;
+        basename?: string;
+      } = {},
+  ) {
+    // Set the internal configuration store
+    setConfig(configParams);
 
-        const containerFallback = document.getElementById("root");
-        let container: HTMLElement | null = null;
+    const containerFallback = document.getElementById("root");
+    let container: HTMLElement | null = null;
 
-        if (typeof configParams.container === "string") {
-            container = document.querySelector(configParams.container);
-        } else if (configParams.container instanceof HTMLElement) {
-            container = configParams.container;
-        } else {
-            container = containerFallback;
-        }
+    if (typeof configParams.container === "string") {
+      container = document.querySelector(configParams.container);
+    } else if (configParams.container instanceof HTMLElement) {
+      container = configParams.container;
+    } else {
+      container = containerFallback;
+    }
 
-        if (!container) {
-            console.error("PageBuilder: container element not found.");
-            return;
-        }
+    if (!container) {
+      console.error("PageBuilder: container element not found.");
+      return;
+    }
 
-        editorInstance = createEditor(configParams);
+    editorInstance = createEditor(configParams);
 
-        if (!rootInstance) {
-            rootInstance = ReactDOM.createRoot(container);
-        }
+    if (!rootInstance) {
+      rootInstance = ReactDOM.createRoot(container);
+    }
 
-        rootInstance.render(
-            <React.StrictMode>
-                <EditorProvider editor={editorInstance}>
-                    <BrowserRouter
-                        basename={configParams.basename || "/pagebuilder"}
-                    >
-                        <Routes>
-                            <Route path="/:slug?" element={<App />} />
-                        </Routes>
-                    </BrowserRouter>
-                </EditorProvider>
-            </React.StrictMode>
+    rootInstance.render(
+      <React.StrictMode>
+        <EditorProvider editor={editorInstance}>
+          <BrowserRouter basename={configParams.basename || "/pagebuilder"}>
+            <Routes>
+              {/* Match any nested path (including slashes) and let the
+                                navigation hook derive the slug from the location. */}
+              <Route path="/*" element={<App />} />
+            </Routes>
+          </BrowserRouter>
+        </EditorProvider>
+      </React.StrictMode>,
+    );
+
+    // Signal that the editor is ready
+    editorInstance.ready();
+
+    // Return a public API similar to GrapesJS
+    return {
+      /** Subscribe to editor change events. */
+      onChange(callback: (data: any) => void) {
+        // Legacy DOM event support
+        window.addEventListener("pagebuilder:change", (e: any) =>
+          callback(e.detail),
         );
+      },
 
-        // Signal that the editor is ready
-        editorInstance.ready();
+      /** Trigger a change event. */
+      triggerChange(data: any) {
+        window.dispatchEvent(
+          new CustomEvent("pagebuilder:change", { detail: data }),
+        );
+      },
 
-        // Return a public API similar to GrapesJS
-        return {
-            /** Subscribe to editor change events. */
-            onChange(callback: (data: any) => void) {
-                // Legacy DOM event support
-                window.addEventListener("pagebuilder:change", (e: any) =>
-                    callback(e.detail)
-                );
-            },
+      /** Register a custom field type. */
+      registerFieldType(type: string, renderer: any) {
+        FieldRegistry.register(type, renderer);
+      },
 
-            /** Trigger a change event. */
-            triggerChange(data: any) {
-                window.dispatchEvent(
-                    new CustomEvent("pagebuilder:change", { detail: data })
-                );
-            },
+      /** Get the central editor instance with all managers. */
+      getEditor(): Editor {
+        return editorInstance!;
+      },
 
-            /** Register a custom field type. */
-            registerFieldType(type: string, renderer: any) {
-                FieldRegistry.register(type, renderer);
-            },
+      /**
+       * @deprecated Use getEditor() instead.
+       */
+      getInstance() {
+        return editorInstance;
+      },
+    };
+  },
 
-            /** Get the central editor instance with all managers. */
-            getEditor(): Editor {
-                return editorInstance!;
-            },
-
-            /**
-             * @deprecated Use getEditor() instead.
-             */
-            getInstance() {
-                return editorInstance;
-            },
-        };
-    },
-
-    createEditor,
+  createEditor,
 };
 
 export default PageBuilder;
@@ -111,5 +111,5 @@ export default PageBuilder;
 // Make PageBuilder globally available strictly so `npm run dev` ES modules
 // behave exactly identically to the UMD bundle output.
 if (typeof window !== "undefined") {
-    (window as any).PageBuilder = PageBuilder;
+  (window as any).PageBuilder = PageBuilder;
 }
