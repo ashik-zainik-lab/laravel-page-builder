@@ -63,7 +63,7 @@ class PageBuilder
     public static function builderRoutes(array $middleware = []): void
     {
         Route::middleware($middleware)->group(function () {
-            require __DIR__ . '/../routes/web.php';
+            require __DIR__.'/../routes/web.php';
         });
     }
 
@@ -120,11 +120,11 @@ class PageBuilder
      */
     public static function css()
     {
-        if (file_exists(__DIR__ . '/../dist/hot')) {
+        if (file_exists(__DIR__.'/../dist/hot')) {
             return new HtmlString('');
         }
 
-        if (($css = @file_get_contents(__DIR__ . '/../dist/app.css')) === false) {
+        if (($css = @file_get_contents(__DIR__.'/../dist/app.css')) === false) {
             throw new RuntimeException('Unable to load the PageBuilder editor CSS. Please run "npm run build" in the package root.');
         }
 
@@ -138,23 +138,23 @@ class PageBuilder
      */
     public static function js()
     {
-        if (file_exists($hot = __DIR__ . '/../dist/hot')) {
+        if (file_exists($hot = __DIR__.'/../dist/hot')) {
             $url = rtrim(file_get_contents($hot), '/');
 
             return new HtmlString(
-                "<script type='module' src='{$url}/@vite/client'></script>\n" .
-                    "<script type='module'>\n" .
-                    "import RefreshRuntime from '{$url}/@react-refresh'\n" .
-                    "RefreshRuntime.injectIntoGlobalHook(window)\n" .
-                    "window.\$RefreshReg\$ = () => {}\n" .
-                    "window.\$RefreshSig\$ = () => (type) => type\n" .
-                    "window.__vite_plugin_react_preamble_installed__ = true\n" .
-                    "</script>\n" .
+                "<script type='module' src='{$url}/@vite/client'></script>\n".
+                    "<script type='module'>\n".
+                    "import RefreshRuntime from '{$url}/@react-refresh'\n".
+                    "RefreshRuntime.injectIntoGlobalHook(window)\n".
+                    "window.\$RefreshReg\$ = () => {}\n".
+                    "window.\$RefreshSig\$ = () => (type) => type\n".
+                    "window.__vite_plugin_react_preamble_installed__ = true\n".
+                    "</script>\n".
                     "<script type='module' src='{$url}/resources/js/main.tsx'></script>"
             );
         }
 
-        if (($js = @file_get_contents(__DIR__ . '/../dist/app.umd.js')) === false) {
+        if (($js = @file_get_contents(__DIR__.'/../dist/app.umd.js')) === false) {
             throw new RuntimeException('Unable to load the PageBuilder editor JavaScript. Please run "npm run build" in the package root.');
         }
 
@@ -173,7 +173,7 @@ class PageBuilder
         $blocks = app(BlockRegistry::class);
 
         return [
-            'baseUrl' => config('app.url') . '/pagebuilder',
+            'baseUrl' => config('app.url').'/pagebuilder',
             'appUrl' => config('app.url'),
             'pages' => array_merge(
                 [
@@ -185,9 +185,9 @@ class PageBuilder
                 // Build a flat array of pages for the frontend where the slug includes its parent prefix when present (parent/slug).
                 collect($pages->pages())
                     ->values()
-                    ->map(static fn(array $page): array => [
+                    ->map(static fn (array $page): array => [
                         ...$page,
-                        'slug' => (! empty($page['parent'])) ? ($page['parent'] . '/' . $page['slug']) : $page['slug'],
+                        'slug' => (! empty($page['parent'])) ? ($page['parent'].'/'.$page['slug']) : $page['slug'],
                     ])
                     ->all()
             ),
