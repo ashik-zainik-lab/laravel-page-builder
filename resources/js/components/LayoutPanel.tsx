@@ -489,7 +489,7 @@ export default function LayoutPanel() {
             editor.layout.endDrag();
 
             // Final sync to ensure preview matches store even on cancel/no-change
-            editor.preview.reorderSections(pageOnlyOrder);
+            editor.preview.reorderSections(editor.sections.getPageOrder());
 
             const activeData = event.active.data.current;
             if (activeData?.type === "block") {
