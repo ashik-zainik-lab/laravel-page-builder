@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.3] - 2026-03-29
+
+### Fixed
+
+- Nested page saving and loading by using full-path identifiers (e.g., `parent/slug`) consistently across services and controllers
+- Database meta resolution and persistence for pages with parents in `PageService`
+- Public route registration for nested pages to ensure correct JSON data is loaded during rendering
+- Enhanced `PageCache` key generation by replacing slashes with dots to ensure compatibility with all cache drivers (especially `file` driver)
+
+### Changed
+
+- Updated `PageRegistry` to key active pages by their full path to prevent collisions between pages sharing the same slug under different parents
+
 ## [1.2.2] - 2026-03-29
 
 ### Fixed
