@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import App from "./App";
-import { createEditor } from "./core/Editor";
+import { createEditor } from "./core/editor";
 import { EditorProvider } from "./core/editorContext";
 import "./styles.css";
 
@@ -75,6 +75,18 @@ const PageBuilder = {
         window.addEventListener("pagebuilder:change", (e: any) =>
           callback(e.detail),
         );
+      },
+
+      /** Subscribe to page change events. */
+      onPageChange(callback: (data: { slug: string | null }) => void) {
+        window.addEventListener("pagebuilder:page-change", (e: any) =>
+          callback(e.detail),
+        );
+      },
+
+      /** Subscribe to exit event. */
+      onExit(callback: () => void) {
+        window.addEventListener("pagebuilder:exit", () => callback());
       },
 
       /** Trigger a change event. */
