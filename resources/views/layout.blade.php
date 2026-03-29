@@ -24,6 +24,16 @@
             container: '#editor',
             ...config,
         });
+
+        // Listen for editor exit event, when using the editor in an iframe
+        editor.onExit(() => {
+            window.parent.postMessage({ type: 'pagebuilder:exit' }, '*');
+        });
+
+        // Listen for page change event, when using the editor in an iframe
+        editor.onPageChange(({ slug }) => {
+            window.parent.postMessage({ type: 'pagebuilder:page-change', slug }, '*');
+        });
     </script>
 </body>
 
