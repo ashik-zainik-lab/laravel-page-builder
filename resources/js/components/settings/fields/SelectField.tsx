@@ -23,7 +23,7 @@ function SelectField({ setting, value, onChange }: SelectFieldProps) {
                 />
             </SelectTrigger>
             <SelectContent>
-                {(setting.options || []).map((opt) => (
+                {(setting.options || []).filter((opt) => opt.value !== "").map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
                         {opt.label}
                     </SelectItem>
