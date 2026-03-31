@@ -182,6 +182,16 @@ class Theme extends Base
 
         $path = $mixPath.$asset;
 
+        // Append versioning if the file exists in the public directory
+        try {
+            $fullPath = public_path($path);
+            if (File::exists($fullPath)) {
+                $path .= '?v='.File::lastModified($fullPath);
+            }
+        } catch (\Throwable $th) {
+            // ignore and fall back to base URL
+        }
+
         return $absolute ? $path : url($path);
     }
 
