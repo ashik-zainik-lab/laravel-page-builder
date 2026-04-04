@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Coderstm\PageBuilder\Services;
 
+use Coderstm\PageBuilder\Facades\Theme;
 use Illuminate\Support\Facades\File;
 
 /**
@@ -29,7 +30,7 @@ use Illuminate\Support\Facades\File;
  */
 final class TemplateStorage
 {
-    protected string $templatesPath;
+    private readonly string $templatesPath;
 
     public function __construct()
     {
@@ -58,6 +59,47 @@ final class TemplateStorage
         }
 
         return $data;
+    }
+
+    /**
+     * Get all available templates from the storage and theme.
+     *
+     * @return array<int, array{label: string, value: string}>
+     */
+    public function all(): array
+    {
+        $templates = collect();
+
+        // 1. Scan default templates path
+        if (File::isDirectory($this->templatesPath)) {
+            $templates = $templates->merge($this->scanDirectory($this->templatesPath));
+        }
+
+        // 2. Scan active theme path
+        try {
+            $themePath = Theme::path('views/templates');
+            if ($themePath !== null && File::isDirectory($themePath)) {
+                $templates = $templates->merge($this->scanDirectory($themePath));
+            }
+        } catch (\Throwable) {
+            // Theme service might not be available or no active theme
+        }
+
+        return $templates->unique('value')->values()->toArray();
+    }
+
+    /**
+     * Scan a directory for .json template files.
+     */
+    private function scanDirectory(string $path): array
+    {
+        return collect(File::files($path))
+            ->filter(fn ($file) => $file->getExtension() === 'json')
+            ->map(fn ($file) => [
+                'label' => str(basename($file->getFilename(), '.json'))->title()->replace('-', ' ')->value(),
+                'value' => basename($file->getFilename(), '.json'),
+            ])
+            ->toArray();
     }
 
     /**

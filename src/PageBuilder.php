@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Coderstm\PageBuilder;
 
 use Coderstm\PageBuilder\Facades\Page;
@@ -7,6 +9,7 @@ use Coderstm\PageBuilder\Observers\PageObserver;
 use Coderstm\PageBuilder\Registry\BlockRegistry;
 use Coderstm\PageBuilder\Registry\SectionRegistry;
 use Coderstm\PageBuilder\Services\PageRegistry;
+use Coderstm\PageBuilder\Services\TemplateStorage;
 use Coderstm\PageBuilder\Services\ThemeSettings;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\HtmlString;
@@ -27,10 +30,8 @@ class PageBuilder
 
     /**
      * The cache key for storing pages data.
-     *
-     * @var string
      */
-    public static $pageCacheKey = 'pagebuilder.pages';
+    public static string $pageCacheKey = 'pagebuilder.pages';
 
     /**
      * The page model class name.
@@ -209,5 +210,15 @@ class PageBuilder
         $preservedPages = config('pagebuilder.preserved_pages', ['home']);
 
         return in_array(strtolower($slug), array_map('strtolower', $preservedPages));
+    }
+
+    /**
+     * Get all available templates.
+     *
+     * @return array<int, array{label: string, value: string}>
+     */
+    public static function templates(): array
+    {
+        return app(TemplateStorage::class)->all();
     }
 }

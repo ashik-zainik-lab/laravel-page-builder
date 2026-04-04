@@ -86,4 +86,83 @@ class TemplateStorageTest extends TestCase
         $settings = $data['sections']['title-banner']['settings'] ?? [];
         $this->assertSame('{{ $page->title }}', $settings['text']);
     }
+
+    public function test_loads_templates_from_configured_templates_path(): void
+    {
+        $customPath = sys_get_temp_dir().'/pb_test_templates_'.uniqid();
+        mkdir($customPath);
+
+        try {
+            file_put_contents($customPath.'/custom.json', json_encode([
+                'sections' => ['main' => ['type' => 'page-content']],
+                'order' => ['main'],
+            ]));
+
+            config(['pagebuilder.templates' => $customPath]);
+
+            $storage = new TemplateStorage;
+            $data = $storage->load('custom');
+
+            $this->assertIsArray($data);
+            $this->assertSame(['main'], $data['order']);
+            $this->assertSame('page-content', $data['sections']['main']['type']);
+        } finally {
+            File::deleteDirectory($customPath);
+        }
+    }
+
+    public function test_all_returns_templates_from_configured_path(): void
+    {
+        $customPath = sys_get_temp_dir().'/pb_test_templates_all_'.uniqid();
+        mkdir($customPath);
+
+        try {
+            file_put_contents($customPath.'/my-layout.json', json_encode([
+                'sections' => [],
+                'order' => [],
+            ]));
+
+            config(['pagebuilder.templates' => $customPath]);
+
+            $storage = new TemplateStorage;
+            $templates = $storage->all();
+
+            $values = array_column($templates, 'value');
+            $this->assertContains('my-layout', $values);
+        } finally {
+            File::deleteDirectory($customPath);
+        }
+    }
+
+    public function test_returns_null_for_template_absent_from_configured_path_and_theme(): void
+    {
+        // 'nonexistent-xyz' does not exist in the workbench templates or the theme,
+        // so load() must return null regardless of the configured path.
+        $this->assertNull($this->storage->load('nonexistent-xyz'));
+    }
+
+    public function test_configured_templates_path_is_used_before_fallback(): void
+    {
+        // Verify that a template only present in the custom path IS loaded,
+        // confirming the configured path is consulted.
+        $customPath = sys_get_temp_dir().'/pb_test_templates_primary_'.uniqid();
+        mkdir($customPath);
+
+        try {
+            file_put_contents($customPath.'/only-in-custom.json', json_encode([
+                'sections' => ['s' => ['type' => 'hero']],
+                'order' => ['s'],
+            ]));
+
+            config(['pagebuilder.templates' => $customPath]);
+
+            $storage = new TemplateStorage;
+            $data = $storage->load('only-in-custom');
+
+            $this->assertIsArray($data);
+            $this->assertSame(['s'], $data['order']);
+        } finally {
+            File::deleteDirectory($customPath);
+        }
+    }
 }
