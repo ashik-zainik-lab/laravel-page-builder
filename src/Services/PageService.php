@@ -220,7 +220,7 @@ class PageService
             if ($path) {
                 Route::get($path, [WebPageController::class, 'pages'])
                     ->defaults('slug', $path)
-                    ->name('pages.'.str_replace('/', '.', $path));
+                    ->name('pages.' . str_replace('/', '.', $path));
             }
         }
 
@@ -239,6 +239,16 @@ class PageService
         }
 
         return PageBuilder::$pageModel::where('is_active', true)
+            ->whereNotIn('slug', config('pagebuilder.reserved_slugs', [
+                'home',
+                'admin',
+                'user',
+                'api',
+                'storage',
+                'uploads',
+                'files',
+                'vendor',
+            ]))
             ->get()
             ->mapWithKeys(function ($page) {
                 $path = $page->parent ? "{$page->parent}/{$page->slug}" : $page->slug;
@@ -343,7 +353,7 @@ class PageService
             'meta_title' => $meta['meta_title'] ?? null,
             'meta_description' => $meta['meta_description'] ?? null,
             'meta_keywords' => $meta['meta_keywords'] ?? null,
-        ], fn ($v) => $v !== null);
+        ], fn($v) => $v !== null);
 
         if (empty($fillable)) {
             return true;

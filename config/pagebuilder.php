@@ -249,7 +249,16 @@ return [
     |
     */
 
-    'preserved_pages' => ['home'],
+    'preserved_pages' => [
+        'home',
+        'admin',
+        'user',
+        'api',
+        'storage',
+        'uploads',
+        'files',
+        'vendor'
+    ],
 
     /*
     |--------------------------------------------------------------------------
