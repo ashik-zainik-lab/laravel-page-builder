@@ -174,27 +174,8 @@ class PageBuilder
         return [
             'baseUrl' => config('app.url') . '/pagebuilder',
             'appUrl' => config('app.url'),
-<<<<<<< HEAD
             'preservedPages' => array_values(array_map('strtolower', config('pagebuilder.preserved_pages', ['home']))),
             'pages' => Page::listPagesForEditor(),
-=======
-            'pages' => array_merge(
-                [
-                    [
-                        'slug' => 'home',
-                        'title' => 'Home',
-                    ],
-                ],
-                // Build a flat array of pages for the frontend where the slug includes its parent prefix when present (parent/slug).
-                collect($pages->pages())
-                    ->values()
-                    ->map(static fn(array $page): array => [
-                        ...$page,
-                        'slug' => (! empty($page['parent'])) ? ($page['parent'] . '/' . $page['slug']) : $page['slug'],
-                    ])
-                    ->all()
-            ),
->>>>>>> 2c4e95c7f828ad9ff1ff51d4674b78e6b5cb3b78
             'sections' => $registry->get(),
             'blocks' => $blocks->get(),
             'themeSettings' => app(ThemeSettings::class)->toArray(),
