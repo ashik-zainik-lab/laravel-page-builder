@@ -2,6 +2,7 @@
     'name' => 'Content',
     'blocks' => [
         ['type' => 'row'],
+        ['type' => '@theme'],
     ],
     'presets' => [
         [

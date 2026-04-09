@@ -381,6 +381,22 @@ Templates are only consulted when both step 1 and step 2 miss. A template never 
 
 ### Creating a template
 
+From the editor, open **Page Meta** and use **Create new template** to generate a template file dynamically.
+
+Generate a starter template with Artisan:
+
+```bash
+php artisan pagebuilder:template page.alternate
+```
+
+Optional flags:
+
+- `--force` overwrite an existing template file
+- `--layout=page` set layout value (`--layout=false` for no layout)
+- `--wrapper="main#page-main.container"` set wrapper selector
+
+Or create files manually.
+
 Place template files in `resources/views/templates/` (configurable via `config('pagebuilder.templates')`).
 
 ```json

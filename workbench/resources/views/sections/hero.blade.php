@@ -3,6 +3,18 @@
     'settings' => [
         ['id' => 'title', 'type' => 'text', 'label' => 'Title', 'default' => 'Welcome'],
         ['id' => 'subtitle', 'type' => 'text', 'label' => 'Subtitle', 'default' => 'Hello World'],
+        [
+            'id' => 'scroll_reveal',
+            'type' => 'select',
+            'label' => 'Scroll reveal',
+            'default' => 'none',
+            'options' => [
+                ['value' => 'none', 'label' => 'None'],
+                ['value' => 'fade-up', 'label' => 'Fade up'],
+                ['value' => 'fade', 'label' => 'Fade'],
+                ['value' => 'zoom', 'label' => 'Zoom in'],
+            ],
+        ],
     ],
     'presets' => [
         ['name' => 'Hero'],

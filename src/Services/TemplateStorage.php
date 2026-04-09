@@ -89,6 +89,56 @@ final class TemplateStorage
     }
 
     /**
+     * Create a new template JSON file in the configured templates directory.
+     *
+     * @param  array{
+     *   sections?: array<string, mixed>,
+     *   order?: array<int, string>,
+     *   layout?: string|false|null,
+     *   wrapper?: string|null
+     * }  $options
+     */
+    public function create(string $name, array $options = [], bool $force = false): bool
+    {
+        $name = $this->normalizeName($name);
+
+        if (! $this->isValidTemplateName($name)) {
+            return false;
+        }
+
+        File::ensureDirectoryExists($this->templatesPath);
+
+        $filePath = rtrim($this->templatesPath, '/').'/'.$name.'.json';
+
+        if (File::exists($filePath) && ! $force) {
+            return false;
+        }
+
+        $payload = [
+            'sections' => $options['sections'] ?? [
+                'main' => ['type' => 'page-content'],
+            ],
+            'order' => $options['order'] ?? ['main'],
+        ];
+
+        if (array_key_exists('layout', $options) && $options['layout'] !== null) {
+            $payload['layout'] = $options['layout'];
+        }
+
+        if (! empty($options['wrapper']) && is_string($options['wrapper'])) {
+            $payload['wrapper'] = $options['wrapper'];
+        }
+
+        $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+        if ($json === false) {
+            return false;
+        }
+
+        return File::put($filePath, $json.PHP_EOL) !== false;
+    }
+
+    /**
      * Scan a directory for .json template files.
      */
     private function scanDirectory(string $path): array
@@ -115,6 +165,12 @@ final class TemplateStorage
         }
 
         return $name !== '' ? $name : 'page';
+    }
+
+    private function isValidTemplateName(string $name): bool
+    {
+        return (bool) preg_match('/^[a-z0-9]+(?:[._-][a-z0-9]+)*$/', $name)
+            && ! str_contains($name, '..');
     }
 
     /**

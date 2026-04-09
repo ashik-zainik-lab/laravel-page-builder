@@ -6,6 +6,13 @@
     <meta name="description" content="{{ $meta_description ?? '' }}" />
     <meta name="author" content="{{ $url ?? config('app.url') }}" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="{{ $meta_title ?? ($title ?? config('app.name')) }}" />
+    <meta property="og:description" content="{{ $meta_description ?? '' }}" />
+    <meta property="og:url" content="{{ url()->current() }}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{ $meta_title ?? ($title ?? config('app.name')) }}" />
+    <meta name="twitter:description" content="{{ $meta_description ?? '' }}" />
     <title>
         {{ $meta_title ?? ($title ?? '') . ' | ' . config('app.name') }}
     </title>

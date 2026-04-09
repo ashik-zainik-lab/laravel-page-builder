@@ -1,11 +1,14 @@
 import { StateCreator } from "zustand";
 import api from "@/services/api";
 import config from "@/config";
+import { toast } from "@/core/toastStore";
+import { ApiError } from "@/services/apiFetch";
 import {
     Page,
     PageMeta,
     SectionData,
     BlockData,
+    TemplateOption,
     ThemeSettingsData,
 } from "@/types/page-builder";
 
@@ -20,9 +23,15 @@ export interface PageSlice {
 
     /** Page meta fields (title, meta_title, meta_description, meta_keywords). */
     pageMeta: PageMeta;
+    pageTemplate: string;
+    templates: TemplateOption[];
 
     /** Global theme settings (schema + values). */
     themeSettings: ThemeSettingsData;
+
+    /** When false, saving persists the page as a draft (is_active = false in DB). */
+    pageIsActive: boolean;
+    setPageIsActive: (active: boolean) => void;
 
     setPages: (pages: any[]) => void;
     setCurrentPage: (page: Page | null) => void;
@@ -36,6 +45,8 @@ export interface PageSlice {
     setPageMeta: (meta: PageMeta) => void;
     /** Merge a partial patch into the current page meta. */
     updatePageMeta: (patch: Partial<PageMeta>) => void;
+    setPageTemplate: (template: string) => void;
+    setTemplates: (templates: TemplateOption[]) => void;
 
     /** Replace theme settings values (preserves schema). */
     setThemeSettingsValues: (values: Record<string, any>) => void;
@@ -62,7 +73,15 @@ export const createPageSlice: StateCreator<
     loading: false,
     saving: false,
     pageMeta: {},
+    pageTemplate: "page",
+    templates: config.templates || [],
     themeSettings: config.themeSettings || { schema: [], values: {} },
+    pageIsActive: true,
+
+    setPageIsActive: (active) =>
+        set((state) => {
+            state.pageIsActive = active;
+        }),
 
     setPages: (pages) => set({ pages }),
     setCurrentPage: (page) => set({ currentPage: page }),
@@ -77,6 +96,8 @@ export const createPageSlice: StateCreator<
         set((state) => {
             state.pageMeta = { ...state.pageMeta, ...patch };
         }),
+    setPageTemplate: (template) => set({ pageTemplate: template }),
+    setTemplates: (templates) => set({ templates }),
 
     setThemeSettingsValues: (values) =>
         set((state) => {
@@ -94,7 +115,10 @@ export const createPageSlice: StateCreator<
         }
         try {
             const data = await api.getPages();
-            set({ pages: data });
+            const list = Array.isArray(data)
+                ? data
+                : Object.values((data as Record<string, unknown>) ?? {});
+            set({ pages: list });
         } catch (err) {
             console.error("Failed to load pages:", err);
         }
@@ -170,6 +194,11 @@ export const createPageSlice: StateCreator<
                 currentPage: data,
                 currentSlug: slug,
                 pageMeta: meta,
+                pageTemplate:
+                    typeof raw.template === "string" && raw.template !== ""
+                        ? raw.template
+                        : "page",
+                pageIsActive: raw.is_active !== false,
                 selectedSection: null,
                 selectedBlock: null,
                 selectedBlockPath: [],
@@ -258,9 +287,27 @@ export const createPageSlice: StateCreator<
                 },
             };
 
-            await api.savePage(state.currentSlug, payload, state.pageMeta, state.themeSettings.values);
+            const res = (await api.savePage(
+                state.currentSlug,
+                payload,
+                state.pageTemplate || "page",
+                state.pageMeta,
+                state.themeSettings.values,
+                state.pageIsActive
+            )) as { message?: string };
+            await get().loadPages();
+            toast.success(
+                typeof res?.message === "string" && res.message !== ""
+                    ? res.message
+                    : "Page saved."
+            );
         } catch (err) {
             console.error("Failed to save:", err);
+            const msg =
+                err instanceof ApiError
+                    ? err.message
+                    : "Could not save the page.";
+            toast.error(msg);
         } finally {
             set({ saving: false });
         }
@@ -270,9 +317,21 @@ export const createPageSlice: StateCreator<
         const state = get();
         set({ saving: true });
         try {
-            await api.saveThemeSettings(state.themeSettings.values);
+            const res = (await api.saveThemeSettings(
+                state.themeSettings.values
+            )) as { message?: string };
+            toast.success(
+                typeof res?.message === "string" && res.message !== ""
+                    ? res.message
+                    : "Theme settings saved."
+            );
         } catch (err) {
             console.error("Failed to save theme settings:", err);
+            const msg =
+                err instanceof ApiError
+                    ? err.message
+                    : "Could not save theme settings.";
+            toast.error(msg);
         } finally {
             set({ saving: false });
         }

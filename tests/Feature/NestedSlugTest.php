@@ -43,7 +43,7 @@ class NestedSlugTest extends TestCase
 
         // 2. Try to access the API route
         // This is expected to FAIL (404) before the fix
-        $response = $this->get('/pagebuilder/page/parent/child');
+        $response = $this->getJson('/pagebuilder/page/parent/child');
 
         $response->assertOk();
     }

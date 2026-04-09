@@ -2,4 +2,5 @@
 
 @section('content')
     {!! $__pb_content !!}
+    @include('pagebuilder::partials.scroll-reveal')
 @endsection

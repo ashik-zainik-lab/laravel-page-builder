@@ -41,6 +41,10 @@ export function useEditor() {
             onUndo: () => editor.undo(),
             onRedo: () => editor.redo(),
             onInspectorToggle: () => editor.layout.toggleInspector(),
+            onSave: () => {
+                if (useStore.getState().saving) return;
+                void editor.pages.save();
+            },
         });
     }, [editor]);
 

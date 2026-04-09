@@ -2,6 +2,7 @@ import {
     BlockData,
     Page,
     SectionData,
+    TemplateOption,
     ThemeSettingsData,
 } from "./types/page-builder";
 import type { AssetProvider } from "./types/asset";
@@ -11,9 +12,12 @@ import laravelAssetProvider from "./services/laravelAssetProvider";
 export interface PageBuilderConfig {
     baseUrl: string;
     appUrl: string;
+    /** Lowercased slugs that cannot be unpublished (e.g. home). */
+    preservedPages?: string[];
     pages: Page[];
     sections: Record<string, SectionData>;
     blocks: Record<string, BlockData>;
+    templates?: TemplateOption[];
     themeSettings: ThemeSettingsData;
     fields: Record<
         string,
@@ -56,6 +60,7 @@ const config: PageBuilderConfig = {
     pages: [],
     sections: {},
     blocks: {},
+    templates: [],
     themeSettings: { schema: [], values: {} },
     fields: {},
 };

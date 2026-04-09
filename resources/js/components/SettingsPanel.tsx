@@ -416,6 +416,211 @@ function SettingsPanel() {
                             No settings for this section.
                         </p>
                     )}
+
+                    <div className="mt-5 pt-4 border-t border-gray-100 space-y-3">
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+                            Universal section controls
+                        </p>
+
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                Section id
+                            </label>
+                            <input
+                                type="text"
+                                value={section.settings?.pb_section_id ?? ""}
+                                onChange={(e) =>
+                                    handleUpdateSectionSettings(selectedSection, {
+                                        pb_section_id: e.target.value,
+                                    })
+                                }
+                                placeholder="hero-main"
+                                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                Extra CSS classes
+                            </label>
+                            <input
+                                type="text"
+                                value={section.settings?.pb_section_class ?? ""}
+                                onChange={(e) =>
+                                    handleUpdateSectionSettings(selectedSection, {
+                                        pb_section_class: e.target.value,
+                                    })
+                                }
+                                placeholder="bg-slate-50 rounded-2xl"
+                                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                Background color
+                            </label>
+                            <input
+                                type="text"
+                                value={section.settings?.pb_bg_color ?? ""}
+                                onChange={(e) =>
+                                    handleUpdateSectionSettings(selectedSection, {
+                                        pb_bg_color: e.target.value,
+                                    })
+                                }
+                                placeholder="#f8fafc or rgba(0,0,0,.1)"
+                                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>
+                                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                    Padding top
+                                </label>
+                                <input
+                                    type="text"
+                                    value={section.settings?.pb_padding_top ?? ""}
+                                    onChange={(e) =>
+                                        handleUpdateSectionSettings(
+                                            selectedSection,
+                                            { pb_padding_top: e.target.value }
+                                        )
+                                    }
+                                    placeholder="24px"
+                                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                    Padding bottom
+                                </label>
+                                <input
+                                    type="text"
+                                    value={section.settings?.pb_padding_bottom ?? ""}
+                                    onChange={(e) =>
+                                        handleUpdateSectionSettings(
+                                            selectedSection,
+                                            { pb_padding_bottom: e.target.value }
+                                        )
+                                    }
+                                    placeholder="24px"
+                                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>
+                                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                    Margin top
+                                </label>
+                                <input
+                                    type="text"
+                                    value={section.settings?.pb_margin_top ?? ""}
+                                    onChange={(e) =>
+                                        handleUpdateSectionSettings(
+                                            selectedSection,
+                                            { pb_margin_top: e.target.value }
+                                        )
+                                    }
+                                    placeholder="16px"
+                                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                    Margin bottom
+                                </label>
+                                <input
+                                    type="text"
+                                    value={section.settings?.pb_margin_bottom ?? ""}
+                                    onChange={(e) =>
+                                        handleUpdateSectionSettings(
+                                            selectedSection,
+                                            { pb_margin_bottom: e.target.value }
+                                        )
+                                    }
+                                    placeholder="16px"
+                                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>
+                                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                    Border radius
+                                </label>
+                                <input
+                                    type="text"
+                                    value={section.settings?.pb_border_radius ?? ""}
+                                    onChange={(e) =>
+                                        handleUpdateSectionSettings(
+                                            selectedSection,
+                                            { pb_border_radius: e.target.value }
+                                        )
+                                    }
+                                    placeholder="12px"
+                                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                    Border color
+                                </label>
+                                <input
+                                    type="text"
+                                    value={section.settings?.pb_border_color ?? ""}
+                                    onChange={(e) =>
+                                        handleUpdateSectionSettings(
+                                            selectedSection,
+                                            { pb_border_color: e.target.value }
+                                        )
+                                    }
+                                    placeholder="#e5e7eb"
+                                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                Border width
+                            </label>
+                            <input
+                                type="text"
+                                value={section.settings?.pb_border_width ?? ""}
+                                onChange={(e) =>
+                                    handleUpdateSectionSettings(selectedSection, {
+                                        pb_border_width: e.target.value,
+                                    })
+                                }
+                                placeholder="1px"
+                                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                                Overlay color
+                            </label>
+                            <input
+                                type="text"
+                                value={section.settings?.pb_overlay_color ?? ""}
+                                onChange={(e) =>
+                                    handleUpdateSectionSettings(selectedSection, {
+                                        pb_overlay_color: e.target.value,
+                                    })
+                                }
+                                placeholder="rgba(0,0,0,.35)"
+                                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors"
+                            />
+                            <p className="mt-1 text-[11px] text-gray-400">
+                                Adds a full overlay layer above this section.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
 

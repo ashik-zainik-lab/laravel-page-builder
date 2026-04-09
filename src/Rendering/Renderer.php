@@ -47,12 +47,135 @@ class Renderer
         }
 
         $html = (string) view($viewName, ['section' => $section])->render();
+        $html = $this->applyUniversalSectionWrapper($html, $section);
 
         if (PageBuilder::editor()) {
             $html = EditorAttributes::autoInjectLiveText($html, $section);
+        } else {
+            $html = $this->wrapScrollReveal($html, $section);
         }
 
         return $html;
+    }
+
+    /**
+     * When a section has `scroll_reveal` set (see section schema), wrap HTML
+     * so front-end assets can animate it into view. No-op in editor mode.
+     *
+     * @param  array<int, string>  $allowed
+     */
+    private function wrapScrollReveal(string $html, Section $section): string
+    {
+        $effect = (string) $section->settings->get('scroll_reveal', 'none');
+        $allowed = ['fade-up', 'fade', 'slide-left', 'slide-right', 'zoom'];
+
+        if ($effect === '' || $effect === 'none' || ! in_array($effect, $allowed, true)) {
+            return $html;
+        }
+
+        $class = 'pb-reveal pb-reveal--'.htmlspecialchars($effect, ENT_QUOTES, 'UTF-8');
+
+        return '<div class="'.$class.'" data-pb-reveal>'.$html.'</div>';
+    }
+
+    /**
+     * Apply universal wrapper attributes/styles for every section.
+     *
+     * These are edited from the section settings panel and work even when a
+     * section schema does not explicitly define them.
+     */
+    private function applyUniversalSectionWrapper(string $html, Section $section): string
+    {
+        $id = $this->sanitizeCssIdentifier((string) $section->settings->get('pb_section_id', ''));
+        $class = trim((string) $section->settings->get('pb_section_class', ''));
+        $bg = trim((string) $section->settings->get('pb_bg_color', ''));
+        $overlay = trim((string) $section->settings->get('pb_overlay_color', ''));
+        $pt = $this->sanitizeCssSize((string) $section->settings->get('pb_padding_top', ''));
+        $pb = $this->sanitizeCssSize((string) $section->settings->get('pb_padding_bottom', ''));
+        $mt = $this->sanitizeCssSize((string) $section->settings->get('pb_margin_top', ''));
+        $mb = $this->sanitizeCssSize((string) $section->settings->get('pb_margin_bottom', ''));
+        $radius = $this->sanitizeCssSize((string) $section->settings->get('pb_border_radius', ''));
+        $borderWidth = $this->sanitizeCssSize((string) $section->settings->get('pb_border_width', ''));
+        $borderColor = trim((string) $section->settings->get('pb_border_color', ''));
+
+        $styles = [];
+        if ($bg !== '') {
+            $styles[] = 'background-color: '.$bg;
+        }
+        if ($mt !== null) {
+            $styles[] = 'margin-top: '.$mt;
+        }
+        if ($mb !== null) {
+            $styles[] = 'margin-bottom: '.$mb;
+        }
+        if ($pt !== null) {
+            $styles[] = 'padding-top: '.$pt;
+        }
+        if ($pb !== null) {
+            $styles[] = 'padding-bottom: '.$pb;
+        }
+        if ($radius !== null) {
+            $styles[] = 'border-radius: '.$radius;
+            $styles[] = 'overflow: hidden';
+        }
+        if ($borderWidth !== null && $borderColor !== '') {
+            $styles[] = 'border-style: solid';
+            $styles[] = 'border-width: '.$borderWidth;
+            $styles[] = 'border-color: '.$borderColor;
+        }
+
+        if ($id === '' && $class === '' && $styles === [] && $overlay === '') {
+            return $html;
+        }
+
+        if ($overlay !== '') {
+            $overlayStyle = htmlspecialchars($overlay, ENT_QUOTES, 'UTF-8');
+            $html = '<div style="position:absolute;inset:0;background-color:'.$overlayStyle.';pointer-events:none;z-index:1"></div>'
+                .'<div style="position:relative;z-index:2">'.$html.'</div>';
+            $styles[] = 'position: relative';
+        }
+
+        $attrs = [];
+        if ($id !== '') {
+            $attrs[] = 'id="'.htmlspecialchars($id, ENT_QUOTES, 'UTF-8').'"';
+        }
+        if ($class !== '') {
+            $attrs[] = 'class="'.htmlspecialchars($class, ENT_QUOTES, 'UTF-8').'"';
+        }
+        if ($styles !== []) {
+            $attrs[] = 'style="'.htmlspecialchars(implode('; ', $styles), ENT_QUOTES, 'UTF-8').'"';
+        }
+
+        return '<div '.implode(' ', $attrs).'>'.$html.'</div>';
+    }
+
+    private function sanitizeCssIdentifier(string $value): string
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return '';
+        }
+
+        return preg_replace('/[^a-zA-Z0-9\-_:.]/', '', $value) ?? '';
+    }
+
+    private function sanitizeCssSize(string $value): ?string
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return null;
+        }
+
+        // Allow bare numbers from UI inputs and treat them as px.
+        if (preg_match('/^-?\d+(?:\.\d+)?$/', $value) === 1) {
+            return $value.'px';
+        }
+
+        if (preg_match('/^-?\d+(?:\.\d+)?(?:px|rem|em|vh|vw|%)$/', $value) === 1) {
+            return $value;
+        }
+
+        return null;
     }
 
     /**

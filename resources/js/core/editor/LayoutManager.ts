@@ -2,7 +2,7 @@ import { useStore } from "@/core/store/useStore";
 import type { BlockSchema } from "@/types/page-builder";
 import type { EventBus } from "./EventBus";
 
-export type SidebarTab = "sections" | "page" | "theme";
+export type SidebarTab = "sections" | "outline" | "page" | "theme";
 
 interface AddSectionModalState {
     isOpen: boolean;

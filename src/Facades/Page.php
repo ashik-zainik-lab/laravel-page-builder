@@ -9,8 +9,10 @@ use Illuminate\Support\Facades\Facade;
  * @method static mixed render(string $slug, array $meta = [])
  * @method static void routes()
  * @method static array allActive()
+ * @method static list<array<string, mixed>> listPagesForEditor()
  * @method static \Illuminate\Database\Eloquent\Model|null findBySlug(string $slug)
  * @method static bool saveMeta(string $slug, array $meta)
+ * @method static bool deleteBySlug(string $slug)
  *
  * @see PageService
  */

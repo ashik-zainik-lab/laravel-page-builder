@@ -10,6 +10,7 @@ import PreviewCanvas from "./components/PreviewCanvas";
 import AddSectionModal from "./components/AddSectionModal";
 import MobileDock from "./components/mobile/MobileDock";
 import MobileDrawer from "./components/mobile/MobileDrawer";
+import ToastViewport from "./components/ToastViewport";
 
 /**
  * Root editor component — pure composition with zero prop drilling.
@@ -49,6 +50,8 @@ export default function App() {
 
             {/* Mobile bottom drawer — shown only on small screens */}
             {!isDesktop && <MobileDrawer />}
+
+            <ToastViewport />
         </div>
     );
 }

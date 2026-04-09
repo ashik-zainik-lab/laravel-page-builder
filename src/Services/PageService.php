@@ -11,7 +11,9 @@ use Coderstm\PageBuilder\Support\PageData;
 use Coderstm\PageBuilder\Support\TemplateVariableResolver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Str;
 
 class PageService
 {
@@ -43,6 +45,11 @@ class PageService
         }
 
         $dbPage = $this->findBySlug($slug);
+
+        if (! PageBuilder::editor() && $dbPage !== null && $dbPage->is_active === false) {
+            abort(404);
+        }
+
         $stored = $this->pageStorage->load($slug);
         $layoutType = $stored?->layoutType() ?? 'page';
         $defaultLayout = $this->layoutParser->defaultLayout($layoutType);
@@ -89,7 +96,7 @@ class PageService
         }
 
         // ── 4. Template fallback ──────────────────────────────────────────
-        $templateData = $this->resolveTemplate($dbPage);
+        $templateData = $this->resolveTemplate($dbPage, $stored);
 
         if ($templateData !== null) {
             $resolvedData = $this->variableResolver->resolve($templateData, $dbPage);
@@ -116,9 +123,14 @@ class PageService
      *
      * @return array<string, mixed>|null
      */
-    protected function resolveTemplate(mixed $dbPage): ?array
+    protected function resolveTemplate(mixed $dbPage, ?PageData $stored = null): ?array
     {
-        $templateName = (string) ($dbPage?->template ?? '');
+        $storedArray = $stored?->toArray() ?? [];
+        $storedTemplate = is_string($storedArray['template'] ?? null)
+            ? (string) $storedArray['template']
+            : '';
+
+        $templateName = (string) ($dbPage?->template ?? $storedTemplate);
         $templateName = $templateName !== '' ? $templateName : 'page';
 
         $data = $this->templateStorage->load($templateName);
@@ -222,6 +234,10 @@ class PageService
      */
     public function allActive(): array
     {
+        if (! Schema::hasTable('pages')) {
+            return [];
+        }
+
         return PageBuilder::$pageModel::where('is_active', true)
             ->get()
             ->mapWithKeys(function ($page) {
@@ -239,10 +255,64 @@ class PageService
     }
 
     /**
+     * All pages for the builder UI (draft + published), as a flat list with is_active.
+     * Preserved slugs missing from the database are injected so they still appear.
+     *
+     * @return list<array{id: int|null, slug: string, parent: string|null, title: string, path: string, is_active: bool}>
+     */
+    public function listPagesForEditor(): array
+    {
+        $byPath = [];
+
+        if (Schema::hasTable('pages')) {
+            foreach (PageBuilder::$pageModel::query()->orderBy('title')->get() as $page) {
+                $path = $page->parent ? "{$page->parent}/{$page->slug}" : $page->slug;
+                $byPath[$path] = [
+                    'id' => $page->id,
+                    'slug' => $path,
+                    'parent' => $page->parent,
+                    'title' => $page->title,
+                    'path' => $path,
+                    'is_active' => (bool) $page->is_active,
+                ];
+            }
+        }
+
+        foreach (config('pagebuilder.preserved_pages', ['home']) as $preservedSlug) {
+            $path = $preservedSlug;
+            if (! array_key_exists($path, $byPath)) {
+                $byPath[$path] = [
+                    'id' => null,
+                    'slug' => $path,
+                    'parent' => null,
+                    'title' => Str::headline(str_replace(['-', '_'], ' ', $preservedSlug)),
+                    'path' => $path,
+                    'is_active' => true,
+                ];
+            }
+        }
+
+        foreach ($byPath as $path => $row) {
+            if (PageBuilder::isPreservedPage($path)) {
+                $byPath[$path]['is_active'] = true;
+            }
+        }
+
+        $list = array_values($byPath);
+        usort($list, static fn (array $a, array $b): int => strcmp((string) $a['title'], (string) $b['title']));
+
+        return $list;
+    }
+
+    /**
      * Find a DB page record by slug.
      */
     public function findBySlug(string $slug): ?Model
     {
+        if (! Schema::hasTable('pages')) {
+            return null;
+        }
+
         if (str_contains($slug, '/')) {
             $paths = explode('/', $slug);
             $slugPart = array_pop($paths);
@@ -286,5 +356,19 @@ class PageService
         }
 
         return (bool) $page->update($fillable);
+    }
+
+    /**
+     * Delete a page from disk and database by full slug path.
+     */
+    public function deleteBySlug(string $slug): bool
+    {
+        $page = $this->findBySlug($slug);
+
+        if ($page !== null && ! $page->delete()) {
+            return false;
+        }
+
+        return $this->pageStorage->delete($slug);
     }
 }

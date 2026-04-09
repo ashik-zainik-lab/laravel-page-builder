@@ -9,6 +9,7 @@ import {
 import LayoutPanel from "@/components/LayoutPanel";
 import SettingsPanel from "@/components/SettingsPanel";
 import PageMetaPanel from "@/components/PageMetaPanel";
+import OutlinePanel from "@/components/OutlinePanel";
 import ThemeSettingsPanel from "@/components/ThemeSettingsPanel";
 import { SidebarSkeleton } from "@/components/ui/SidebarSkeleton";
 import { useDrawer } from "@/hooks/useDrawer";
@@ -18,6 +19,7 @@ import type { MobileDrawerPanel } from "@/core/editor/DrawerManager";
 
 const PANEL_LABELS: Record<MobileDrawerPanel, string> = {
     sections: "Layers",
+    outline: "Navigator",
     page: "Pages",
     theme: "Theme",
 };
@@ -64,6 +66,8 @@ function MobileDrawer() {
         switch (activePanel) {
             case "sections":
                 return selectedSection ? <SettingsPanel /> : <LayoutPanel />;
+            case "outline":
+                return <OutlinePanel />;
             case "page":
                 return <PageMetaPanel />;
             case "theme":

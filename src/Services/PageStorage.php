@@ -13,7 +13,10 @@ use Illuminate\Support\Facades\File;
  */
 class PageStorage
 {
-    public function __construct(protected readonly PageCache $pageCache) {}
+    public function __construct(
+        protected readonly PageCache $pageCache,
+        protected readonly PageRevisionHistory $revisionHistory,
+    ) {}
 
     /**
      * Load and decode a page JSON file by slug.
@@ -37,8 +40,10 @@ class PageStorage
 
     /**
      * Persist a page's JSON data to disk, creating the pages directory if needed.
+     *
+     * @param  bool  $writeRevisionSnapshot  When true, the previous file contents are kept in revision history.
      */
-    public function save(string $slug, array|PageData $data): bool
+    public function save(string $slug, array|PageData $data, bool $writeRevisionSnapshot = true): bool
     {
         $pagesPath = config('pagebuilder.pages');
 
@@ -64,6 +69,18 @@ class PageStorage
         // $filePath already defined above
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
+        if (
+            $writeRevisionSnapshot
+            && config('pagebuilder.revision_history.enabled', true)
+            && File::exists($filePath)
+        ) {
+            $previous = File::get($filePath);
+
+            if (is_string($previous) && $previous !== $json) {
+                $this->revisionHistory->pushSnapshot($slug, $previous);
+            }
+        }
+
         $result = File::put($filePath, $json) !== false;
 
         if ($result) {
@@ -71,5 +88,25 @@ class PageStorage
         }
 
         return $result;
+    }
+
+    /**
+     * Delete a page JSON file and related revision snapshots.
+     */
+    public function delete(string $slug): bool
+    {
+        $pagesPath = (string) config('pagebuilder.pages');
+        $filePath = $pagesPath.'/'.$slug.'.json';
+        $safeSlug = str_replace(['/', '\\'], '__', $slug);
+        $historyPath = rtrim($pagesPath, '/').'/.history/'.$safeSlug;
+
+        $deletedJson = ! File::exists($filePath) || File::delete($filePath);
+        $deletedHistory = ! File::isDirectory($historyPath) || File::deleteDirectory($historyPath);
+
+        if ($deletedJson && $deletedHistory) {
+            $this->pageCache->forget($slug);
+        }
+
+        return $deletedJson && $deletedHistory;
     }
 }

@@ -22,6 +22,7 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
         private readonly string $title = '',
         private readonly array $meta = [],
         private readonly ?string $wrapper = null,
+        private readonly string $template = 'page',
     ) {}
 
     /**
@@ -63,6 +64,9 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
             title: (string) ($data['title'] ?? ''),
             meta: is_array($data['meta'] ?? null) ? $data['meta'] : [],
             wrapper: $wrapper,
+            template: is_string($data['template'] ?? null) && $data['template'] !== ''
+                ? (string) $data['template']
+                : 'page',
         );
     }
 
@@ -295,6 +299,11 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
         return $this->wrapper;
     }
 
+    public function template(): string
+    {
+        return $this->template;
+    }
+
     /**
      * Determine if the page has no sections.
      */
@@ -332,6 +341,7 @@ final class PageData implements Arrayable, Jsonable, JsonSerializable
             'layout' => $layout,
             'title' => $this->title,
             'meta' => $this->meta,
+            'template' => $this->template,
         ];
 
         if ($this->wrapper !== null) {

@@ -3,6 +3,7 @@ import VerticalTabStrip from "./layout/VerticalTabStrip";
 import LayoutPanel from "./LayoutPanel";
 import SettingsPanel from "./SettingsPanel";
 import PageMetaPanel from "./PageMetaPanel";
+import OutlinePanel from "./OutlinePanel";
 import ThemeSettingsPanel from "./ThemeSettingsPanel";
 import { SidebarSkeleton } from "./ui/SidebarSkeleton";
 import { useEditorLayout } from "@/hooks/useEditorLayout";
@@ -27,6 +28,10 @@ function EditorSidebar() {
 
         if (layout.sidebarTab === "page") {
             return <PageMetaPanel />;
+        }
+
+        if (layout.sidebarTab === "outline") {
+            return <OutlinePanel />;
         }
 
         if (layout.sidebarTab === "theme") {

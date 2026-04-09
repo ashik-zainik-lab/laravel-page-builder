@@ -9,7 +9,7 @@
  * any component can react to drawer state without prop drilling.
  */
 
-export type MobileDrawerPanel = "sections" | "page" | "theme";
+export type MobileDrawerPanel = "sections" | "outline" | "page" | "theme";
 
 interface DrawerState {
     activePanel: MobileDrawerPanel | null;

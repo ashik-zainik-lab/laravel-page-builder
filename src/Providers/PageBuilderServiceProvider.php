@@ -67,6 +67,7 @@ class PageBuilderServiceProvider extends ServiceProvider
 
         $this->app->singleton(Services\PageCache::class);
         $this->app->singleton(PageRegistry::class);
+        $this->app->singleton(Services\PageRevisionHistory::class);
         $this->app->singleton(PageStorage::class);
         $this->app->singleton(TemplateStorage::class);
         $this->app->singleton(ThemeSettings::class);
@@ -97,14 +98,29 @@ class PageBuilderServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Register section paths from config
+        $stubSectionsPath = __DIR__.'/../../stubs/sections';
+        $stubBlocksPath = __DIR__.'/../../stubs/blocks';
+
+        // Register section paths from config.
+        // In Orchestra Testbench, config('pagebuilder.sections') points to the
+        // framework fixture path. Add package stubs as a fallback so demo-only
+        // sections like `header` remain available in workbench.
         if ($sections = config('pagebuilder.sections')) {
             Facades\Section::add($sections);
+
+            if (is_string($sections) && str_contains($sections, 'testbench-core') && is_dir($stubSectionsPath)) {
+                Facades\Section::add($stubSectionsPath);
+            }
         }
 
-        // Register block paths from config
+        // Register block paths from config.
+        // Same Testbench fallback as sections above (for blocks like `nav-link`).
         if ($blocks = config('pagebuilder.blocks')) {
             Facades\Block::add($blocks);
+
+            if (is_string($blocks) && str_contains($blocks, 'testbench-core') && is_dir($stubBlocksPath)) {
+                Facades\Block::add($stubBlocksPath);
+            }
         }
 
         // Set active theme
@@ -143,6 +159,7 @@ class PageBuilderServiceProvider extends ServiceProvider
 
         // Commands
         $this->commands([
+            Commands\CreateTemplate::class,
             Commands\InstallPageBuilder::class,
             Commands\RegeneratePages::class,
             Commands\ThemeLink::class,

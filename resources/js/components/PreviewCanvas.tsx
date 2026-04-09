@@ -6,8 +6,7 @@ import React, {
   useState,
 } from "react";
 import api from "../services/api";
-import config from "../config";
-import { Loader2, Layout } from "lucide-react";
+import { ExternalLink, Loader2, Layout } from "lucide-react";
 import { LoadingBar } from "./ui/LoadingBar";
 import { injectEditorScript } from "../core/messaging/EditorScriptInjector";
 import { useEditorInstance } from "@/core/editorContext";
@@ -231,15 +230,36 @@ export default function PreviewCanvas() {
 
   /* ── Preview URL ─────────────────────────────────────────────────── */
   const previewUrl = slug ? api.getPreviewUrl(slug) : null;
+  const liveUrl = slug ? api.getLiveUrl(slug) : null;
 
-  /* ── Live URL ────────────────────────────────────────────────────── */
-  const liveUrl = slug
-    ? `${config.appUrl}${slug === "home" ? "/" : `/${slug}`}`
-    : null;
+  const openLivePage = useCallback(() => {
+    if (!liveUrl) return;
+    window.open(liveUrl, "_blank", "noopener,noreferrer");
+  }, [liveUrl]);
 
   return (
     <div className="flex-1 flex flex-col bg-gray-100 overflow-hidden relative">
       <LoadingBar isProcessing={saving || isReloading} />
+      {previewUrl && slug && liveUrl && (
+        <div className="flex items-center justify-between gap-2 px-3 py-1.5 border-b border-gray-200 bg-gray-50 shrink-0">
+          <span className="text-xs text-gray-500 truncate min-w-0">
+            <span className="hidden md:inline">
+              Editor preview — open{" "}
+              <span className="font-medium text-gray-600">View live</span> to
+              match visitors
+            </span>
+            <span className="md:hidden font-medium text-gray-600">Preview</span>
+          </span>
+          <button
+            type="button"
+            onClick={openLivePage}
+            className="inline-flex items-center gap-1 shrink-0 rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+          >
+            <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+            View live
+          </button>
+        </div>
+      )}
       <div
         ref={canvasRef}
         className="flex-1 overflow-hidden flex justify-center p-0 md:p-2"

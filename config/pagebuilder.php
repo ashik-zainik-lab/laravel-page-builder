@@ -15,6 +15,21 @@ return [
     // Path to the pages directory (JSON data files)
     'pages' => resource_path('views/pages'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Page revision history (JSON snapshots before each save)
+    |--------------------------------------------------------------------------
+    |
+    | Snapshots are stored under `{pages}/.history/{slug}/`. Disable on read-only
+    | or shared filesystems if needed.
+    |
+    */
+
+    'revision_history' => [
+        'enabled' => env('PAGEBUILDER_REVISION_HISTORY', true),
+        'max' => (int) env('PAGEBUILDER_REVISION_MAX', 10),
+    ],
+
     // Path to the sections directory (Blade section templates)
     'sections' => resource_path('views/sections'),
 

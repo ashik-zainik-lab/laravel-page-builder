@@ -2,6 +2,7 @@ interface ShortcutActions {
     onUndo: () => void;
     onRedo: () => void;
     onInspectorToggle: () => void;
+    onSave: () => void;
 }
 
 /**
@@ -12,6 +13,7 @@ export class ShortcutManager {
         onUndo: () => {},
         onRedo: () => {},
         onInspectorToggle: () => {},
+        onSave: () => {},
     };
 
     private mounted = false;
@@ -26,6 +28,12 @@ export class ShortcutManager {
     private readonly handleKeyDown = (e: KeyboardEvent): void => {
         const isMod = e.metaKey || e.ctrlKey;
         if (!isMod) return;
+
+        if (e.key === "s" || e.key === "S") {
+            e.preventDefault();
+            this.actions.onSave();
+            return;
+        }
 
         // Let the browser handle undo/redo natively inside text fields
         if (e.key === "z" || e.key === "y") {

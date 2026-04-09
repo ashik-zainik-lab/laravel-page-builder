@@ -1,0 +1,33 @@
+{
+    "layout": "page",
+    "wrapper": "main.flex.w-full.flex-col.flex-1",
+    "sections": {
+        "hero": {
+            "type": "hero",
+            "settings": {
+                "text_align": "center",
+                "section_height": "default",
+                "background_image": "",
+                "background_position": "center",
+                "overlay_color": "#000000",
+                "overlay_opacity": 0,
+                "title": "{{ $page->title }}",
+                "subtitle": "A minimal layout — add sections from the library as you grow.",
+                "button_label": "",
+                "button_url": "#",
+                "background_color": "#f8fafc",
+                "title_color": "",
+                "subtitle_color": ""
+            },
+            "blocks": {},
+            "order": []
+        },
+        "main": {
+            "type": "content",
+            "settings": {},
+            "blocks": {},
+            "order": []
+        }
+    },
+    "order": ["hero", "main"]
+}

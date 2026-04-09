@@ -1,6 +1,6 @@
-import React, { useCallback, useSyncExternalStore } from "react";
+import React, { useCallback, useEffect, useSyncExternalStore } from "react";
 import { DeviceSwitcher, UndoRedoControls, EditorLogo } from "./header";
-import { Crosshair, LogOut } from "lucide-react";
+import { Crosshair, ExternalLink, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Select,
@@ -14,6 +14,8 @@ import { useEditorNavigation } from "@/hooks/useEditorNavigation";
 import { useEditorLayout } from "@/hooks/useEditorLayout";
 import { useStore } from "@/core/store/useStore";
 import { useMaxBreakpoint } from "@/hooks/useBreakpoint";
+import config from "@/config";
+import api from "@/services/api";
 
 /**
  * Top header bar — reads all state directly from the editor context,
@@ -21,10 +23,19 @@ import { useMaxBreakpoint } from "@/hooks/useBreakpoint";
  */
 export default function EditorHeader() {
   const editor = useEditorInstance();
-  const { pages, saving } = useStore();
+  const { pages, saving, pageIsActive, setPageIsActive } = useStore();
   const { slug, device, setPage, setDevice } = useEditorNavigation();
+  const preserved = config.preservedPages ?? [];
+  const slugLower = (slug ?? "").toLowerCase();
+  const isPreservedPage = preserved.includes(slugLower);
   const { inspectorEnabled } = useEditorLayout();
   const isMobile = useMaxBreakpoint(768);
+
+  useEffect(() => {
+    if (isPreservedPage) {
+      setPageIsActive(true);
+    }
+  }, [isPreservedPage, setPageIsActive]);
 
   // Subscribe to history manager for reactive canUndo / canRedo.
   useSyncExternalStore(
@@ -61,6 +72,7 @@ export default function EditorHeader() {
               {pages.map((p) => (
                 <SelectItem key={p.slug} value={p.slug}>
                   {p.title}
+                  {p.is_active === false ? " (Draft)" : ""}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -102,12 +114,72 @@ export default function EditorHeader() {
         />
       </div>
 
-      {/* ── Right: Save button ──────────────────────────── */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      {/* ── Right: Draft / Live + Save ──────────────────────────── */}
+      <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 min-w-0">
+        {isPreservedPage ? (
+          <span
+            className="inline-flex items-center rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-[10px] sm:text-xs font-medium text-gray-600 whitespace-nowrap"
+            title="This system page is always visible on the site"
+          >
+            Always live
+          </span>
+        ) : (
+          <div
+            className="flex items-center rounded-lg border border-gray-200 p-0.5 text-[10px] sm:text-xs font-medium flex-shrink-0"
+            title="Draft pages are hidden from public URLs until you switch to Live and Save"
+          >
+            <button
+              type="button"
+              onClick={() => setPageIsActive(false)}
+              className={cn(
+                "px-2 sm:px-2.5 py-1 rounded-md transition-colors",
+                !pageIsActive
+                  ? "bg-gray-900 text-white"
+                  : "text-gray-500 hover:bg-gray-50",
+              )}
+            >
+              Draft
+            </button>
+            <button
+              type="button"
+              onClick={() => setPageIsActive(true)}
+              className={cn(
+                "px-2 sm:px-2.5 py-1 rounded-md transition-colors",
+                pageIsActive
+                  ? "bg-emerald-600 text-white"
+                  : "text-gray-500 hover:bg-gray-50",
+              )}
+            >
+              Live
+            </button>
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={() => {
+            if (!slug) return;
+            window.open(
+              api.getLiveUrl(slug),
+              "_blank",
+              "noopener,noreferrer",
+            );
+          }}
+          disabled={!slug}
+          title={
+            !pageIsActive && !isPreservedPage
+              ? "Open public URL — draft pages may 404 until you set Live and Save"
+              : "Open this page on the live site (new tab)"
+          }
+          className="flex p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition-colors
+                        disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+        >
+          <ExternalLink className="w-[18px] h-[18px]" />
+        </button>
         <button
           type="button"
           onClick={() => editor.pages.save()}
           disabled={saving || !slug}
+          title="Save page (Ctrl+S or ⌘S)"
           className="px-4 py-1.5 rounded-lg text-sm font-semibold transition-all
                         bg-gray-900 text-white hover:bg-gray-800
                         disabled:opacity-40 disabled:cursor-not-allowed"

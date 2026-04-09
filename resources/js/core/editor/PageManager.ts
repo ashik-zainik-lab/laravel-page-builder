@@ -42,6 +42,11 @@ export class PageManager {
         return useStore.getState().themeSettings;
     }
 
+    /** Get selected page template name. */
+    getTemplate(): string {
+        return useStore.getState().pageTemplate;
+    }
+
     /** Check if the editor is currently loading. */
     isLoading(): boolean {
         return useStore.getState().loading;
@@ -91,6 +96,12 @@ export class PageManager {
     updateMeta(patch: Partial<PageMeta>): void {
         useStore.getState().updatePageMeta(patch);
         this.events.emit("page:meta-updated", { meta: patch });
+    }
+
+    /** Update current page template name. */
+    updateTemplate(template: string): void {
+        useStore.getState().setPageTemplate(template);
+        this.events.emit("page:template-updated", { template });
     }
 
     /** Update a single theme setting value. */

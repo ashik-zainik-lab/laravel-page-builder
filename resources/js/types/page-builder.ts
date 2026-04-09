@@ -1,7 +1,9 @@
 export interface Page {
-    id: string;
+    id?: string | number | null;
     title: string;
     slug: string;
+    /** When false, the page is a draft (not shown publicly when served via PageService). */
+    is_active?: boolean;
     /**
      * Flat map of ALL sections used by the editor — both page sections and
      * layout sections (header, footer, …).
@@ -19,8 +21,14 @@ export interface Page {
      */
     order: string[];
     meta?: PageMeta;
+    template?: string;
     /** Kept for internal round-trip; not used directly by editor UI. */
     layout?: PageLayout;
+}
+
+export interface TemplateOption {
+    label: string;
+    value: string;
 }
 
 /**

@@ -1,0 +1,351 @@
+{
+    "layout": "page",
+    "wrapper": "main.flex.w-full.flex-col.flex-1",
+    "sections": {
+        "hero": {
+            "type": "hero",
+            "settings": {
+                "text_align": "center",
+                "section_height": "tall",
+                "background_image": "",
+                "background_position": "center",
+                "overlay_color": "#000000",
+                "overlay_opacity": 0,
+                "title": "{{ $page->title }}",
+                "subtitle": "Professional sections, blocks, and templates — install once, customize in the editor.",
+                "button_label": "View pricing",
+                "button_url": "#pricing",
+                "background_color": "#f1f5f9",
+                "title_color": "",
+                "subtitle_color": ""
+            },
+            "blocks": {},
+            "order": []
+        },
+        "logos": {
+            "type": "logo-strip",
+            "settings": {
+                "heading": "Trusted by teams who ship",
+                "subheading": ""
+            },
+            "blocks": {},
+            "order": []
+        },
+        "metrics": {
+            "type": "stats",
+            "settings": {
+                "heading": "Numbers that matter",
+                "subheading": "Swap metrics for your real KPIs — no code deploy.",
+                "columns": "4",
+                "background_color": "#ffffff",
+                "show_divider": true
+            },
+            "blocks": {
+                "st_1": {
+                    "type": "stat-item",
+                    "settings": {
+                        "prefix": "",
+                        "value": "10",
+                        "suffix": "k+",
+                        "label": "Active customers",
+                        "hint": "Across 40 countries"
+                    }
+                },
+                "st_2": {
+                    "type": "stat-item",
+                    "settings": {
+                        "prefix": "",
+                        "value": "99.9",
+                        "suffix": "%",
+                        "label": "Uptime SLA",
+                        "hint": "Enterprise tier"
+                    }
+                },
+                "st_3": {
+                    "type": "stat-item",
+                    "settings": {
+                        "prefix": "",
+                        "value": "24",
+                        "suffix": "/7",
+                        "label": "Support",
+                        "hint": "Chat & email"
+                    }
+                },
+                "st_4": {
+                    "type": "stat-item",
+                    "settings": {
+                        "prefix": "<",
+                        "value": "50",
+                        "suffix": "ms",
+                        "label": "Median latency",
+                        "hint": "Global edge"
+                    }
+                }
+            },
+            "order": ["st_1", "st_2", "st_3", "st_4"]
+        },
+        "features": {
+            "type": "feature-grid",
+            "settings": {
+                "heading": "Built for marketing and product",
+                "subheading": "Drop in rows, columns, headings, buttons, and images. No deploy needed for copy changes.",
+                "header_align": "center"
+            },
+            "blocks": {},
+            "order": []
+        },
+        "split": {
+            "type": "split-media",
+            "settings": {
+                "image": "",
+                "image_alt": "",
+                "eyebrow": "Highlight",
+                "heading": "Showcase your product",
+                "body": "<p>Pair photography or UI screenshots with persuasive copy. Flip image left or right on desktop for variety.</p>",
+                "reverse": false,
+                "background_color": "#ffffff"
+            },
+            "blocks": {},
+            "order": []
+        },
+        "video": {
+            "type": "embed-video",
+            "settings": {
+                "heading": "Product walkthrough",
+                "subheading": "Paste any public YouTube or Vimeo link in the sidebar.",
+                "video_url": "",
+                "caption": "",
+                "align": "center",
+                "max_width": "4xl"
+            },
+            "blocks": {},
+            "order": []
+        },
+        "stories": {
+            "type": "testimonials",
+            "settings": {
+                "heading": "What customers say",
+                "subheading": "Replace these with real quotes when you go live.",
+                "columns": "3"
+            },
+            "blocks": {
+                "tm_1": {
+                    "type": "testimonial",
+                    "settings": {
+                        "quote": "<p>We shipped our new site in days instead of weeks. The editor is intuitive for the whole marketing team.</p>",
+                        "author": "Samira Khan",
+                        "role": "Marketing Director",
+                        "photo": "",
+                        "rating": "5"
+                    }
+                },
+                "tm_2": {
+                    "type": "testimonial",
+                    "settings": {
+                        "quote": "<p>Structured sections keep our brand consistent. We iterate copy without opening the codebase.</p>",
+                        "author": "Jordan Lee",
+                        "role": "Founder, Northwind",
+                        "photo": "",
+                        "rating": "5"
+                    }
+                },
+                "tm_3": {
+                    "type": "testimonial",
+                    "settings": {
+                        "quote": "<p>Performance on mobile is solid. Migration support answered our questions quickly.</p>",
+                        "author": "Casey Ng",
+                        "role": "Engineering Lead",
+                        "photo": "",
+                        "rating": "4"
+                    }
+                }
+            },
+            "order": ["tm_1", "tm_2", "tm_3"]
+        },
+        "article": {
+            "type": "rich-text",
+            "settings": {
+                "heading": "Long-form content",
+                "content": "<p>Use rich text for policies, detailed offers, or blog-style sections. Lists and links work out of the box.</p><ul><li>Fast iteration in the visual editor</li><li>Consistent layout components</li></ul>",
+                "alignment": "left"
+            },
+            "blocks": {},
+            "order": []
+        },
+        "rhythm": {
+            "type": "spacer",
+            "settings": {
+                "size": "md",
+                "variant": "fade",
+                "background_color": ""
+            },
+            "blocks": {},
+            "order": []
+        },
+        "pricing": {
+            "type": "pricing",
+            "settings": {
+                "heading": "Pricing",
+                "subheading": "Starter preset below — edit tiers in the sidebar.",
+                "header_align": "center"
+            },
+            "blocks": {
+                "pt_starter": {
+                    "type": "pricing-tier",
+                    "settings": {
+                        "name": "Starter",
+                        "price": "$19",
+                        "period": "/mo",
+                        "description": "For individuals",
+                        "badge": "",
+                        "features": "5 projects\nEmail support\nBasic analytics",
+                        "button_label": "Choose Starter",
+                        "button_url": "#",
+                        "highlighted": false
+                    }
+                },
+                "pt_pro": {
+                    "type": "pricing-tier",
+                    "settings": {
+                        "name": "Pro",
+                        "price": "$49",
+                        "period": "/mo",
+                        "description": "For growing teams",
+                        "badge": "Popular",
+                        "features": "Unlimited projects\nPriority support\nAdvanced analytics\nSSO",
+                        "button_label": "Choose Pro",
+                        "button_url": "#",
+                        "highlighted": true
+                    }
+                },
+                "pt_ent": {
+                    "type": "pricing-tier",
+                    "settings": {
+                        "name": "Enterprise",
+                        "price": "Custom",
+                        "period": "",
+                        "description": "For large organizations",
+                        "badge": "",
+                        "features": "Dedicated success manager\nSLA & security review\nCustom contracts",
+                        "button_label": "Contact sales",
+                        "button_url": "#",
+                        "highlighted": false
+                    }
+                }
+            },
+            "order": ["pt_starter", "pt_pro", "pt_ent"]
+        },
+        "faq": {
+            "type": "faq",
+            "settings": {
+                "heading": "FAQ",
+                "subheading": "Short answers you can refine for your business."
+            },
+            "blocks": {
+                "fq_1": {
+                    "type": "faq-item",
+                    "settings": {
+                        "question": "Can I try before I buy?",
+                        "answer": "<p>Yes — start with a trial or book a demo. Swap this text in the editor.</p>"
+                    }
+                },
+                "fq_2": {
+                    "type": "faq-item",
+                    "settings": {
+                        "question": "How does billing work?",
+                        "answer": "<p>Plans bill monthly or annually. You can change plans from your account.</p>"
+                    }
+                },
+                "fq_3": {
+                    "type": "faq-item",
+                    "settings": {
+                        "question": "Is my data secure?",
+                        "answer": "<p>We use encryption in transit and at rest. Ask us about enterprise compliance.</p>"
+                    }
+                }
+            },
+            "order": ["fq_1", "fq_2", "fq_3"]
+        },
+        "social": {
+            "type": "social-bar",
+            "settings": {
+                "heading": "Connect with us",
+                "align": "center",
+                "background_color": "#f8fafc"
+            },
+            "blocks": {
+                "sl_1": {
+                    "type": "social-link",
+                    "settings": {
+                        "network": "twitter",
+                        "url": "#",
+                        "label": ""
+                    }
+                },
+                "sl_2": {
+                    "type": "social-link",
+                    "settings": {
+                        "network": "linkedin",
+                        "url": "#",
+                        "label": ""
+                    }
+                },
+                "sl_3": {
+                    "type": "social-link",
+                    "settings": {
+                        "network": "youtube",
+                        "url": "#",
+                        "label": ""
+                    }
+                },
+                "sl_4": {
+                    "type": "social-link",
+                    "settings": {
+                        "network": "github",
+                        "url": "#",
+                        "label": ""
+                    }
+                }
+            },
+            "order": ["sl_1", "sl_2", "sl_3", "sl_4"]
+        },
+        "cta": {
+            "type": "cta-banner",
+            "settings": {
+                "eyebrow": "Next step",
+                "heading": "Launch your next page today",
+                "text": "Use this CTA at the bottom of landing pages to drive signups or contact requests.",
+                "button_label": "Get started",
+                "button_url": "#",
+                "align": "center",
+                "background_color": "#0f172a",
+                "text_color": "#ffffff",
+                "button_style": "solid"
+            },
+            "blocks": {},
+            "order": []
+        },
+        "builder": {
+            "type": "content",
+            "settings": {},
+            "blocks": {},
+            "order": []
+        }
+    },
+    "order": [
+        "hero",
+        "logos",
+        "metrics",
+        "features",
+        "split",
+        "video",
+        "stories",
+        "article",
+        "rhythm",
+        "pricing",
+        "faq",
+        "social",
+        "cta",
+        "builder"
+    ]
+}

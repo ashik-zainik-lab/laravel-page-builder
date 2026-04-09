@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { Layers, FileText, Palette } from "lucide-react";
+import { Layers, ListTree, FileText, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDrawer } from "@/hooks/useDrawer";
 import type { MobileDrawerPanel } from "@/core/editor/DrawerManager";
@@ -12,8 +12,9 @@ interface DockItem {
 
 const DOCK_ITEMS: DockItem[] = [
     { id: "sections", label: "Layers", icon: <Layers size={20} /> },
-    { id: "page",     label: "Pages",  icon: <FileText size={20} /> },
-    { id: "theme",    label: "Theme",  icon: <Palette size={20} /> },
+    { id: "outline", label: "Nav", icon: <ListTree size={20} /> },
+    { id: "page", label: "Pages", icon: <FileText size={20} /> },
+    { id: "theme", label: "Theme", icon: <Palette size={20} /> },
 ];
 
 /**

@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { Layers, FileText, Palette } from "lucide-react";
+import { Layers, ListTree, FileText, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SidebarTab } from "@/hooks/useEditorLayout";
 
@@ -11,6 +11,7 @@ interface TabItem {
 
 const TABS: TabItem[] = [
     { id: "sections", label: "Sections", icon: <Layers size={15} /> },
+    { id: "outline", label: "Navigator", icon: <ListTree size={15} /> },
     { id: "page", label: "Page", icon: <FileText size={15} /> },
     { id: "theme", label: "Theme", icon: <Palette size={15} /> },
 ];
@@ -22,7 +23,7 @@ interface VerticalTabStripProps {
 
 /**
  * Vertical icon tab strip rendered on the far-left edge of the sidebar.
- * Switches between Sections, Page meta, and Theme settings panels.
+ * Switches between Sections, Navigator tree, Page meta, and Theme settings.
  */
 function VerticalTabStrip({ activeTab, onTabChange }: VerticalTabStripProps) {
     return (

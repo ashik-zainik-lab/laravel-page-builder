@@ -29,9 +29,10 @@ class SchemaExtractorTest extends TestCase
 
         $this->assertIsArray($result);
         $this->assertSame('Hero', $result['name']);
-        $this->assertCount(2, $result['settings']);
+        $this->assertCount(3, $result['settings']);
         $this->assertSame('title', $result['settings'][0]['id']);
         $this->assertSame('subtitle', $result['settings'][1]['id']);
+        $this->assertSame('scroll_reveal', $result['settings'][2]['id']);
         $this->assertCount(0, $result['blocks'] ?? []);
         $this->assertCount(1, $result['presets']);
     }
